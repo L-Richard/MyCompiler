@@ -123,25 +123,31 @@ void Parser::constDefinition() {
 		if (current_token.getType() != Symbol::becomes) {
 			// error_handler.reportErrorMsg();
 		}
-		// **** test();
-		if (type_token.getType() == Symbol::intsy) {
+		else {
 			nextSym();
+		}
+		
+		if (type_token.getType() == Symbol::intsy) {
 			int tmpConstInt = signedInt({});	// ?????????????????????? fsys
 			// enter symbol table
 		}
 		else if (type_token.getType() == Symbol::charsy) {
-			nextSym();
 			if (current_token.getType() == charcon) {
 				// enter symbol table 
 			}
 			else {
-				// error 
+				// error: type not coherent
 				
 			}
 		}
-
+		else {
+			// error: not type
+		}
+		// skip to definition end
+		// test();
 
 		////////////////////////////
+		/*
 		sy = current_token.getType();
 		if (sy == intcon || sy == charcon) {
 			// token is a constant, check type
@@ -166,6 +172,7 @@ void Parser::constDefinition() {
 			// not a const int or const char 
 			// **** error_handler.reportErrorMsg();
 		}
+		*/
 	} while (current_token.getType() == Symbol::comma);
 	if (current_token.getType() == Symbol::semicolon) {
 		nextSym();
@@ -368,10 +375,26 @@ void Parser::caseStatement() {
 	statement();
 }
 
+void Parser::expression() {
+	if (current_token.getType() == Symbol::plus
+		|| current_token.getType() == Symbol::minus) {
+		// terms are connected with + or -
+	}
+
+}
+
 void Parser::item(SymSet fsys) {
 
 	SymSet tmpFacFsys = fsys;
-	tmpFacFsys.insert({times, Symbol::slash});
+	tmpFacFsys.insert({Symbol::times, Symbol::slash});
+	factor(tmpFacFsys);
+	while (current_token.getType() == Symbol::times
+		|| current_token.getType() == Symbol::slash) {
+		// factor is connected with * or /
+		// need to record the operator 
+		nextSym();
+		factor(tmpFacFsys);
+	}
 }
 
 void Parser::factor(SymSet fsys) {
