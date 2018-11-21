@@ -16,6 +16,9 @@ private:
 	// symbol table: 
 	vector<SymbolItem> symTab;
 
+	// function: need btab, return flag
+	bool hasRet;
+
 	// need to record an identifier's Symbol type, adr,  
 
 	class item {
@@ -25,6 +28,7 @@ private:
 public:
 	void skip(SymSet fsys);		// skip words until current_token's type in fsys,
 	void test(SymSet s1, SymSet s2, int no);	// 
+	void testSemicolon();
 	void enter(const Token& t, ObjectiveType obj, int level);
 	// search table for a 
 	int searchTab(const Token& identifier);	
@@ -34,10 +38,7 @@ public:
 	void varDeclaration();
 	int  signedInt(SymSet fsys);
 	void selector();
-	void headDeclaration();		// func with return value or variable declaration
-	void funWithRet();
-	void funWithoutRet();
-	void block();				// 
+	void function();
 	void statement();
 	void paraList();
 	void condition();
@@ -50,7 +51,6 @@ public:
 	void call();
 	void assignStatement();
 	void caseStatement();
-	void statement();
 	void multiStatement();
 	void compoundstatement();
 	void read();

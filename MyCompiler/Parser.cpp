@@ -32,6 +32,10 @@ void Parser::test(SymSet s1, SymSet s2, int no) {
 	}
 }
 
+void Parser::testSemicolon() {
+
+}
+
 void Parser::enter(const Token& t, ObjectiveType obj, int level) {
 
 }
@@ -64,20 +68,20 @@ void Parser::parse() {
 		// check if redefine an identifier
 		// **** searchTab(current_token);
 		nextSym();
-		if (current_token.getSymbol == Symbol::lparent) {
+		if (current_token.getSymbol() == Symbol::lparent) {
 			varDefDone = true;
 		}
-		if (type_token.getSymbol() == Symbol::voidsy && name_token.getIdentName == "main") {
+		if (type_token.getSymbol() == Symbol::voidsy && name_token.getIdentName() == "main") {
 			// main function no parameters, no return value;
 
 			break;
 		}
 		if (varDefDone) {
-			if (type_token.getSymbol == Symbol::voidsy) {
-				funWithoutRet();
+			if (type_token.getSymbol() == Symbol::voidsy) {
+				function();
 			}
 			else {
-				funWithRet();
+				function();
 			}
 		}
 		else {
@@ -101,7 +105,7 @@ int Parser::signedInt(SymSet fsys) {
 			nextSym();
 		}
 		if (current_token.getSymbol() == intcon) {
-			return current_token.getConstNum * sign;
+			return current_token.getConstNum() * sign;
 		}
 		else {
 			// error
@@ -180,11 +184,19 @@ void Parser::constDefinition() {
 	// **** test; // check semicolon, 
 	// skip to comma, ident, int, char, void,
 #ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
 	cout << "常量定义语句" << endl;
 #endif
 }
 
+
 void Parser::varDeclaration() {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "变量声明语句" << endl;
+#endif // DEBUG_Gramma_analysis
 	/* before call this function, we use type_token to record 
 	 the type of var and we use name_token to record var's name.
 	 And the current_token is not a '(', it means not function 
@@ -249,12 +261,12 @@ void Parser::varDeclaration() {
 #endif // DEBUG_Gramma_analysis
 }
 
-void Parser::funWithoutRet() {
-	// test lbrace,
-
-}
-
 void Parser::compoundstatement() {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "复合语句" << endl;
+#endif // DEBUG_Gramma_analysis
 	// 
 	// while sy in statement begin symbol set
 	while (current_token.getSymbol() == Symbol::constsy) {
@@ -281,21 +293,29 @@ void Parser::compoundstatement() {
 }
 
 void Parser::multiStatement() {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "语句列" << endl;
+#endif // DEBUG_Gramma_analysis
 	test({}, {}, 0);
 	while (statementBsys.count(current_token.getSymbol())) {
 		statement();
 	}
 }
 
-void Parser::block() {
-
-}
-
 void Parser::statement() {
 	Symbol sy = current_token.getSymbol();
 	if (statementBsys.count(sy)) {
 		switch (sy) {
-		case Symbol::lbrace:	block();			break;
+		case Symbol::lbrace: {
+			multiStatement();
+			test({ Symbol::rbrace }, {}, 0);
+			if (current_token.getSymbol() == Symbol::rbrace) {
+				nextSym();
+			}
+			break;
+		}
 		case Symbol::ifsy:		ifStatement({});		break;
 		case Symbol::switchsy:	switchStatement();	break;
 		case Symbol::whilesy:	whileStatement();	break;
@@ -306,17 +326,20 @@ void Parser::statement() {
 			name_token = current_token;
 			nextSym();
 			// ？？？？？？？？？？？？？？？？？？？？？？需要改进
-			switch (current_token.getSymbol()) {
-			case Symbol::lsquare:	
-			case Symbol::becomes:	assignStatement();	break;
-			case Symbol::lparent:	call();				break;	
-			default: {
+			if (current_token.getSymbol() == Symbol::lsquare) {
+				selector();
+			}
+			if (current_token.getSymbol() == Symbol::becomes) {
+				assignStatement();
+			}
+			else if (current_token.getSymbol() == Symbol::lparent) {
+				call();
+			}
+			else {
 #ifdef DEBUG_Gramma_analysis
 				cout << current_token.getlc() << "行， " << current_token.getcc() << "列， ";
 				cout << "出错：标识符后需要等号或小括号！" << endl;
 #endif // DEBUG_Gramma_analysis
-				
-			}
 			}
 			break;
 		}
@@ -329,32 +352,45 @@ void Parser::statement() {
 		}
 	}
 }
-void Parser::assignStatement() {
-	// ？？？？？？？？？？？？？？？？？？？？？？？？？
-	/*
-	current_token is name
-	nextSym();	// read =
-	*/
+
+void Parser::selector() {
 	if (current_token.getSymbol() == Symbol::lsquare) {
 		nextSym();	// read a int con
+		test({ Symbol::intcon }, {}, 0);		// ????????????????????????????
 		if (current_token.getSymbol() == intcon) {
 			nextSym();
 		}
-		else {
-			// error
-			// 
-			if () {
-
-			}
-
+		// check right square
+		test({ Symbol::rsquare }, {}, 0);	// ???????????????
+		if (current_token.getSymbol() == Symbol::rsquare) {
+			nextSym();
 		}
 	}
-	expression();
+	// do something
+}
+
+void Parser::assignStatement() {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "赋值语句" << endl;
+#endif // DEBUG_Gramma_analysis
+	/*		？？？？？？？？？？？？？？？？？？？？？？？？？
+	current_token is name
+	nextSym();	// read =
+	*/
+	test({ Symbol::becomes }, {}, 0);
+	if (current_token.getSymbol() == Symbol::becomes) {
+		nextSym();
+		expression();
+	}
+	// do something
+	testSemicolon();
 }
 
 void Parser::ifStatement(SymSet fsys) {
 	// ？？？？？？？？？？？？？？？？？？？？？？？？？error id
-	SymSet fsys;
+	//SymSet fsys;
 	fsys.insert(statementBsys.begin(), statementBsys.end());
 	fsys.insert({ Symbol::lbrace });
 #ifdef DEBUG_Gramma_analysis
@@ -427,6 +463,212 @@ void Parser::caseStatement() {
 	}
 	// test colon
 	statement();
+}
+
+void Parser::whileStatement() {
+	nextSym();
+	test({ Symbol::lparent }, {}, 0);
+	if (current_token.getSymbol() == Symbol::lparent) {
+		nextSym();
+		condition();
+		test({ Symbol::rparent }, {}, 0);
+		if (current_token.getSymbol() == Symbol::rparent) {
+			nextSym();
+			statement();
+		}
+	}
+}
+
+void Parser::paraList() {
+	/* begin with left parent, end with right parent*/
+	// 以什么字符开头？？？？？？？？？？？？？？？？？？暂定进入函数前读入了一个括号
+	do {
+		nextSym();
+		if (current_token.getSymbol() == Symbol::rparent) {
+			// done
+			break;
+		}
+		else if (current_token.getSymbol() == Symbol::intsy || current_token.getSymbol() == Symbol::charsy) {
+			type_token = current_token;
+			nextSym();
+			if (current_token.getSymbol() == Symbol::ident) {
+				name_token = current_token;
+				nextSym();
+			}
+		}
+		else {
+			// error: missing type define
+		}
+	} while (current_token.getSymbol() == Symbol::comma);
+	/*
+	nextSym();
+	while (current_token.getSymbol() == Symbol::intsy
+		|| current_token.getSymbol() == Symbol::charsy) {
+		type_token = current_token;
+		nextSym();
+		if (current_token.getSymbol() == Symbol::ident) {
+			name_token = current_token;
+			nextSym();
+			if (current_token.getSymbol() == Symbol::comma) {
+				nextSym();
+			}
+		}
+
+
+	}
+	*/
+}
+
+void Parser::function() {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "function 语句" << endl;
+#endif // DEBUG_Gramma_analysis
+	// 以什么字符开头？？？？？？？？？？？？？？？？？？？？？？？？？？
+	
+	paraList();
+	test({ Symbol::rparent }, {}, 0);
+	if (current_token.getSymbol() == Symbol::rparent) {
+		nextSym();
+	}
+	test({ Symbol::lbrace }, {}, 0);
+	if (current_token.getSymbol() == Symbol::lbrace) {
+		nextSym();
+		compoundstatement();
+	}
+	test({ Symbol::rbrace }, {}, 0);
+	if (current_token.getSymbol() == Symbol::rbrace) {
+		nextSym();
+	}
+}
+
+void Parser::call() {
+	/*
+	begin with left parent, end with semicolon.
+	*/
+	test({ lparent }, {}, 0);
+	if (current_token.getSymbol() == lparent) {
+		nextSym();
+		do {
+			expression();
+		} while (current_token.getSymbol() == Symbol::comma);
+		test({ rparent }, {}, 0);
+		if (current_token.getSymbol() == Symbol::rparent) {
+			nextSym();
+		}
+		testSemicolon();
+	}
+}
+
+void Parser::read() {
+	/* begin with left parent, end with semicolon*/
+	test({ lparent }, {}, 0);
+	if (current_token.getSymbol() == Symbol::lparent) {
+		do {
+			nextSym();
+			if (current_token.getSymbol() == Symbol::rparent) {
+				// done
+				break;
+			}
+			else if (current_token.getSymbol() == Symbol::ident) {
+				// record
+				nextSym();
+			}
+			else {
+				// error:？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
+				cout << "缺少标识符" << endl;
+			}
+		} while (current_token.getSymbol() == Symbol::comma);
+		test({ Symbol::rparent }, {}, 0);
+		if (current_token.getSymbol() == Symbol::rparent) {
+			nextSym();
+		}
+		testSemicolon();
+	}
+}
+
+void Parser::write() {
+	/* begin with left parent '(', end with semicolon*/
+	bool wHasExp = false;
+	bool wHasStr = false;
+	bool wHasComma = false;
+	test({ lparent }, {}, 0);
+
+	if (current_token.getSymbol() == Symbol::lparent) {
+		nextSym();
+		if (current_token.getSymbol() == stringcon) {
+			// stab
+			wHasStr = true;
+			nextSym();
+		}
+		if (current_token.getSymbol() == Symbol::comma) {
+			wHasComma = true;
+			nextSym();
+
+		}
+		if (expBsys.count(current_token.getSymbol())) {
+			wHasExp = true;
+			expression();
+		}
+		if (wHasComma) {
+			if (!wHasStr) {
+#ifdef DEBUG_Gramma_analysis
+				cout << current_token.getlc() << "行， " << current_token.getcc() << "列， ";
+				cout << "出错：缺少字符串" << endl;
+#endif // DEBUG_Gramma_analysis
+			}
+			if (!wHasExp) {
+#ifdef DEBUG_Gramma_analysis
+				cout << current_token.getlc() << "行， " << current_token.getcc() << "列， ";
+				cout << "出错：缺少表达式" << endl;
+#endif // DEBUG_Gramma_analysis
+			}
+		}
+		else {
+			if (wHasStr && wHasExp) {
+#ifdef DEBUG_Gramma_analysis
+				cout << current_token.getlc() << "行， " << current_token.getcc() << "列， ";
+				cout << "出错：缺少逗号" << endl;
+#endif // DEBUG_Gramma_analysis
+			}
+		}
+
+		do {
+			nextSym();
+			if (current_token.getSymbol() == Symbol::rparent) {
+				// done
+				break;
+			}
+			else if (current_token.getSymbol() == Symbol::ident) {
+				// record
+				nextSym();
+			}
+			else {
+				// error:？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
+				cout << "缺少标识符" << endl;
+			}
+		} while (current_token.getSymbol() == Symbol::comma);
+		test({ Symbol::rparent }, {}, 0);
+		if (current_token.getSymbol() == Symbol::rparent) {
+			nextSym();
+		}
+		testSemicolon();
+	}
+}
+
+void Parser::condition() {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "condition 语句" << endl;
+#endif // DEBUG_Gramma_analysis
+	expression();
+	if (logicalOperatorSys.count(current_token.getSymbol())) {
+		nextSym();
+		expression();
+	}
+	// need record the result
 }
 
 void Parser::expression() {

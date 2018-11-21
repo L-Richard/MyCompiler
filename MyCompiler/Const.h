@@ -41,6 +41,22 @@ const SymSet factorBsys = {
 	Symbol::ident,
 	Symbol::lparent
 };
+const SymSet logicalOperatorSys = {
+	Symbol::	eql, 
+	Symbol::neq, 
+	Symbol::gtr, 
+	Symbol::geq, 
+	Symbol::les, 
+	Symbol::leq,	
+};
+const SymSet expBsys = {
+	Symbol::plus,
+	Symbol::minus,
+	Symbol::ident,
+	Symbol::lparent,
+	Symbol::intcon,
+	Symbol::charcon,
+};
 
 const int nkw = 27;  
 const int alng = 10; 
