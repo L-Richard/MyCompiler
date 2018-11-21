@@ -18,13 +18,13 @@ void Parser::nextSym() {
 }
 
 void Parser::skip(SymSet fsys) {
-	while (!fsys.count(current_token.getType())) {
+	while (!fsys.count(current_token.getSymbol())) {
 		nextSym();
 	}
 }
 
 void Parser::test(SymSet s1, SymSet s2, int no) {
-	if (!s1.count(current_token.getType())) {
+	if (!s1.count(current_token.getSymbol())) {
 		// **** error_handler;
 		
 		s1.insert(s2.begin(), s2.end());
@@ -44,7 +44,7 @@ void Parser::parse() {
 	nextSym();
 	// **** test();
 	// const definition
-	while (current_token.getType() == Symbol::constsy) {
+	while (current_token.getSymbol() == Symbol::constsy) {
 		nextSym();
 		constDefinition();
 	}
@@ -54,8 +54,8 @@ void Parser::parse() {
 	// **** test(), skip to varFunDeclBegSym
 	// variable definition
 	// function
-	while (!current_token.isEnd() && varFunDeclBegSym.count(current_token.getType())) {
-		if (current_token.getType() == Symbol::voidsy) {
+	while (!current_token.isEnd() && varFunDeclBegSym.count(current_token.getSymbol())) {
+		if (current_token.getSymbol() == Symbol::voidsy) {
 			varDefDone = true;
 		}
 		type_token = current_token;		// record type of var or func
@@ -64,16 +64,16 @@ void Parser::parse() {
 		// check if redefine an identifier
 		// **** searchTab(current_token);
 		nextSym();
-		if (current_token.getType == Symbol::lparent) {
+		if (current_token.getSymbol == Symbol::lparent) {
 			varDefDone = true;
 		}
-		if (type_token.getType() == Symbol::voidsy && name_token.getIdentName == "main") {
+		if (type_token.getSymbol() == Symbol::voidsy && name_token.getIdentName == "main") {
 			// main function no parameters, no return value;
 
 			break;
 		}
 		if (varDefDone) {
-			if (type_token.getType == Symbol::voidsy) {
+			if (type_token.getSymbol == Symbol::voidsy) {
 				funWithoutRet();
 			}
 			else {
@@ -89,7 +89,7 @@ void Parser::parse() {
 }
 int Parser::signedInt(SymSet fsys) {
 	SymSet tmp = { Symbol::minus, Symbol::plus, Symbol::intcon };
-	Symbol sy = current_token.getType();
+	Symbol sy = current_token.getSymbol();
 	int sign = 1;
 	test(tmp, fsys, 0);
 	if (tmp.count(sy)) {
@@ -100,7 +100,7 @@ int Parser::signedInt(SymSet fsys) {
 		else if (sy == Symbol::plus) {
 			nextSym();
 		}
-		if (current_token.getType() == intcon) {
+		if (current_token.getSymbol() == intcon) {
 			return current_token.getConstNum * sign;
 		}
 		else {
@@ -120,19 +120,19 @@ void Parser::constDefinition() {
 		// check symbol table
 		nextSym();
 		// =
-		if (current_token.getType() != Symbol::becomes) {
+		if (current_token.getSymbol() != Symbol::becomes) {
 			// error_handler.reportErrorMsg();
 		}
 		else {
 			nextSym();
 		}
 		
-		if (type_token.getType() == Symbol::intsy) {
+		if (type_token.getSymbol() == Symbol::intsy) {
 			int tmpConstInt = signedInt({});	// ?????????????????????? fsys
 			// enter symbol table
 		}
-		else if (type_token.getType() == Symbol::charsy) {
-			if (current_token.getType() == charcon) {
+		else if (type_token.getSymbol() == Symbol::charsy) {
+			if (current_token.getSymbol() == charcon) {
 				// enter symbol table 
 			}
 			else {
@@ -148,16 +148,16 @@ void Parser::constDefinition() {
 
 		////////////////////////////
 		/*
-		sy = current_token.getType();
+		sy = current_token.getSymbol();
 		if (sy == intcon || sy == charcon) {
 			// token is a constant, check type
-			if (type_token.getType() == intcon && sy == intcon) {
+			if (type_token.getSymbol() == intcon && sy == intcon) {
 				int tmpContstInt = current_token.getConstNum();
 				// enter symbol table
 
 				nextSym();
 			}
-			else if (type_token.getType() == charcon && sy == charcon) {
+			else if (type_token.getSymbol() == charcon && sy == charcon) {
 				char tmpConstChar = current_token.getConstChar();
 				// enter symbol table
 				
@@ -173,8 +173,8 @@ void Parser::constDefinition() {
 			// **** error_handler.reportErrorMsg();
 		}
 		*/
-	} while (current_token.getType() == Symbol::comma);
-	if (current_token.getType() == Symbol::semicolon) {
+	} while (current_token.getSymbol() == Symbol::comma);
+	if (current_token.getSymbol() == Symbol::semicolon) {
 		nextSym();
 	}
 	// **** test; // check semicolon, 
@@ -198,10 +198,10 @@ void Parser::varDeclaration() {
 		}
 		firstLoop = false;
 
-		if (current_token.getType() == Symbol::lsquare) {
+		if (current_token.getSymbol() == Symbol::lsquare) {
 			// array type
 			nextSym();
-			Symbol sy = current_token.getType();
+			Symbol sy = current_token.getSymbol();
 			int tmpArrayMax = 0;
 			if (sy == Symbol::plus || sy == Symbol::minus) {
 				// error
@@ -213,10 +213,10 @@ void Parser::varDeclaration() {
 			}
 			
 			// read a num
-			if (current_token.getType() == Symbol::intcon) {
+			if (current_token.getSymbol() == Symbol::intcon) {
 				tmpArrayMax = current_token.getConstNum();
 				nextSym();
-				if (current_token.getType() == Symbol::rsquare) {
+				if (current_token.getSymbol() == Symbol::rsquare) {
 					// no problem and enter symbol table
 					nextSym();
 				}
@@ -241,7 +241,7 @@ void Parser::varDeclaration() {
 
 			nextSym();
 		}
-	} while (current_token.getType() == Symbol::comma);
+	} while (current_token.getSymbol() == Symbol::comma);
 	// **** test(); 
 	// must semicolon end the declar
 #ifdef DEBUG_Gramma_analysis
@@ -255,14 +255,44 @@ void Parser::funWithoutRet() {
 }
 
 void Parser::compoundstatement() {
+	// 
 	// while sy in statement begin symbol set
+	while (current_token.getSymbol() == Symbol::constsy) {
+		constDefinition();
+	}
+	while (current_token.getSymbol() == Symbol::intsy
+		|| current_token.getSymbol() == Symbol::charsy) {
+		nextSym();
+		if (current_token.getSymbol() == Symbol::ident) {
+			nextSym();
+		}
+		else {
+			// error: missing ident name
+#ifdef DEBUG_Gramma_analysis
+			cout << current_token.getlc() << "行， " << current_token.getcc() << "列， ";
+			cout << "出错：缺少标识符" << endl;
+#endif // DEBUG_Gramma_analysis
+		}
+		varDeclaration();
+	}
+	if (statementBsys.count(current_token.getSymbol())) {
+		multiStatement();
+	}
 }
+
+void Parser::multiStatement() {
+	test({}, {}, 0);
+	while (statementBsys.count(current_token.getSymbol())) {
+		statement();
+	}
+}
+
 void Parser::block() {
 
 }
 
 void Parser::statement() {
-	Symbol sy = current_token.getType();
+	Symbol sy = current_token.getSymbol();
 	if (statementBsys.count(sy)) {
 		switch (sy) {
 		case Symbol::lbrace:	block();			break;
@@ -273,9 +303,11 @@ void Parser::statement() {
 		case Symbol::printfsy:	write();			break;
 		case Symbol::ident: {
 			// search symbol table
+			name_token = current_token;
 			nextSym();
 			// ？？？？？？？？？？？？？？？？？？？？？？需要改进
-			switch (current_token.getType()) {
+			switch (current_token.getSymbol()) {
+			case Symbol::lsquare:	
 			case Symbol::becomes:	assignStatement();	break;
 			case Symbol::lparent:	call();				break;	
 			default: {
@@ -297,6 +329,28 @@ void Parser::statement() {
 		}
 	}
 }
+void Parser::assignStatement() {
+	// ？？？？？？？？？？？？？？？？？？？？？？？？？
+	/*
+	current_token is name
+	nextSym();	// read =
+	*/
+	if (current_token.getSymbol() == Symbol::lsquare) {
+		nextSym();	// read a int con
+		if (current_token.getSymbol() == intcon) {
+			nextSym();
+		}
+		else {
+			// error
+			// 
+			if () {
+
+			}
+
+		}
+	}
+	expression();
+}
 
 void Parser::ifStatement(SymSet fsys) {
 	// ？？？？？？？？？？？？？？？？？？？？？？？？？error id
@@ -310,10 +364,10 @@ void Parser::ifStatement(SymSet fsys) {
 #endif // DEBUG_Gramma_analysis
 	nextSym();
 	test({ Symbol::lparent }, statementBsys, 0);
-	if (current_token.getType() == Symbol::lparent) {
+	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
 		condition();
-		if (current_token.getType() == Symbol::rparent) {
+		if (current_token.getSymbol() == Symbol::rparent) {
 			nextSym();
 		}
 		else {
@@ -325,7 +379,7 @@ void Parser::ifStatement(SymSet fsys) {
 		}
 		test({ Symbol::lbrace }, fsys, 0);
 
-		if (current_token.getType() == lbrace) {
+		if (current_token.getSymbol() == lbrace) {
 			multiStatement();
 			test({ Symbol::rbrace }, statementBsys, 0);
 		}
@@ -340,10 +394,10 @@ void Parser::switchStatement() {
 #endif // DEBUG_Gramma_analysis
 	nextSym();
 	test({ Symbol::lparent }, { statementBsys }, 0);
-	if (current_token.getType() == lparent) {
+	if (current_token.getSymbol() == lparent) {
 		nextSym();
 		expression();
-		if (current_token.getType() == rparent) {
+		if (current_token.getSymbol() == rparent) {
 			nextSym();
 		}
 		else {
@@ -362,7 +416,7 @@ void Parser::caseStatement() {
 	nextSym();
 	// test expression ??
 	expression();
-	if (current_token.getType() == Symbol::colon) {
+	if (current_token.getSymbol() == Symbol::colon) {
 		nextSym();
 	}
 	else {
@@ -376,20 +430,40 @@ void Parser::caseStatement() {
 }
 
 void Parser::expression() {
-	if (current_token.getType() == Symbol::plus
-		|| current_token.getType() == Symbol::minus) {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "expression 语句" << endl;
+#endif // DEBUG_Gramma_analysis
+	// need an item record result of an expression
+	SymSet itemFsys = {};
+	if (current_token.getSymbol() == Symbol::plus
+		|| current_token.getSymbol() == Symbol::minus) {
 		// terms are connected with + or -
+		// record the operator
+		nextSym();
+		item(itemFsys);
+	}
+	while (current_token.getSymbol() == Symbol::plus
+		|| current_token.getSymbol() == Symbol::minus) {
+		nextSym();
+		item(itemFsys);
 	}
 
 }
 
 void Parser::item(SymSet fsys) {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "item 语句" << endl;
+#endif // DEBUG_Gramma_analysis
 
 	SymSet tmpFacFsys = fsys;
 	tmpFacFsys.insert({Symbol::times, Symbol::slash});
 	factor(tmpFacFsys);
-	while (current_token.getType() == Symbol::times
-		|| current_token.getType() == Symbol::slash) {
+	while (current_token.getSymbol() == Symbol::times
+		|| current_token.getSymbol() == Symbol::slash) {
 		// factor is connected with * or /
 		// need to record the operator 
 		nextSym();
@@ -398,13 +472,18 @@ void Parser::item(SymSet fsys) {
 }
 
 void Parser::factor(SymSet fsys) {
+#ifdef DEBUG_Gramma_analysis
+	int lc = current_token.getlc();
+	cout << lc << "行: ";
+	cout << "factor 语句" << endl;
+#endif // DEBUG_Gramma_analysis
 	test(factorBsys, fsys, 0);
-	if (factorBsys.count(current_token.getType())) {
-		switch (current_token.getType()) {
+	if (factorBsys.count(current_token.getSymbol())) {
+		switch (current_token.getSymbol()) {
 		case Symbol::ident: {
 			// search symbol table
 			nextSym();
-			switch (current_token.getType()) {
+			switch (current_token.getSymbol()) {
 			case Symbol::lparent:	call();		break;
 			case Symbol::lsquare:	selector();	break;
 			default: {

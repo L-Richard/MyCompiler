@@ -2,15 +2,15 @@
 #include "Token.h"
 #include <iostream>
 
-Token::Token(Symbol type, int lc, int cc, string ident_name, int inum) {
-	this->type = type;
+Token::Token(Symbol sym, int lc, int cc, string ident_name, int inum) {
+	this->sym = sym;
 	this->ident_name = ident_name;
 	this->cc = cc;
 	this->lc = lc;
 	this->inum = inum;
 }
 bool Token::isEnd() {
-	return type == Symbol::eofsy;
+	return sym == Symbol::eofsy;
 }
 int Token::getlc() {
 	return this->lc;
@@ -19,24 +19,24 @@ int Token::getcc() {
 	return this->cc;
 }
 
-Symbol Token::getType() {
-	return this->type;
+Symbol Token::getSymbol() {
+	return this->sym;
 }
 
 char Token::getConstChar() {
-	if (this->type == Symbol::charcon) {
+	if (this->sym == Symbol::charcon) {
 		return this->ident_name[0];
 	}
 	else {
 #ifdef DEBUG_TOKEN_MSG
-		cout << "Error in Token::getConstChar: this token is not const char type!" << endl;
+		cout << "Error in Token::getConstChar: this token is not const char sym!" << endl;
 #endif
 		return 0;
 	}
 }
 
 int Token::getConstNum() {
-	if (this->type == Symbol::intcon)
+	if (this->sym == Symbol::intcon)
 		return this->inum;
 	else {
 #ifdef DEBUG_TOKEN_MSG
@@ -48,19 +48,19 @@ int Token::getConstNum() {
 
 string Token::getIdentName() {
 #ifdef DEBUG_TOKEN_MSG
-	if (!this->type == Symbol::ident) 
-		cout << "Error in Token::getIdentName: this token is not an ident type!" << endl;
+	if (!this->sym == Symbol::ident) 
+		cout << "Error in Token::getIdentName: this token is not an ident sym!" << endl;
 #endif
 	return this->ident_name;
 }
 
 string Token::getString() {
 	//  record string const and char const with first char 
-	if (this->type == Symbol::stringcon)
+	if (this->sym == Symbol::stringcon)
 		return this->ident_name;
 	else {
 #ifdef DEBUG_TOKEN_MSG
-		cout << "Error in Token::getString: this token is not const string type!" << endl;
+		cout << "Error in Token::getString: this token is not const string sym!" << endl;
 #endif
 		return "";
 	}
@@ -113,6 +113,6 @@ string Enum2Str(Symbol sym) {
 	case Symbol::printfsy: return "printfsy";
 	case Symbol::scanfsy: return "scanfsy";
 	case Symbol::eofsy: return "eofsy";
-	default: return "type not found";
+	default: return "sym not found";
 	}
 }

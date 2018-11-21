@@ -31,17 +31,17 @@ enum Symbol {
 string Enum2Str(Symbol sym);
 class Token {
 private:
-	Symbol type;
-	string ident_name;
+	Symbol sym;
+	string ident_name;	// name, stringcon, charcon
 	int lc, cc, inum;
 public:
-	Token(Symbol type, int lc, int cc, string ident_name="", int inum=0);
+	Token(Symbol sym, int lc, int cc, string ident_name="", int inum=0);
 	int getlc();
 	int getcc();
 	int getConstNum();
 	string getIdentName();
 	string getString();
-	Symbol getType();
+	Symbol getSymbol();
 	char getConstChar();
 
 	bool isEnd();
