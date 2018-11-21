@@ -22,9 +22,10 @@ enum Symbol {
 	dquote,		// "
 	becomes, 	// =	
 	// key word
-	ifsy, switchsy, casesy, whilesy,
+	ifsy, switchsy, casesy, defaultsy, 
+	whilesy, returnsy,
 	intsy, constsy, charsy, voidsy,
-	printfsy, scanfsy,
+	printfsy, scanfsy, 
 	// end of file
 	eofsy
 };
@@ -35,6 +36,7 @@ private:
 	string ident_name;	// name, stringcon, charcon
 	int lc, cc, inum;
 public:
+	Token();
 	Token(Symbol sym, int lc, int cc, string ident_name="", int inum=0);
 	int getlc();
 	int getcc();

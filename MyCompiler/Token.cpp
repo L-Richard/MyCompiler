@@ -2,6 +2,13 @@
 #include "Token.h"
 #include <iostream>
 
+Token::Token() {
+	this->sym = notsy;
+	this->ident_name = "";
+	this->cc = 0;
+	this->lc = 0;
+	this->inum = 0;
+}
 Token::Token(Symbol sym, int lc, int cc, string ident_name, int inum) {
 	this->sym = sym;
 	this->ident_name = ident_name;
@@ -104,6 +111,7 @@ string Enum2Str(Symbol sym) {
 	case Symbol::ifsy: return "ifsy";
 	case Symbol::switchsy: return "switchsy";
 	case Symbol::casesy: return "casesy";
+	case Symbol::defaultsy: return "defaultsy";
 	case Symbol::whilesy: return "whilesy";
 	case Symbol::intsy: return "intsy";
 	case Symbol::constsy: return "constsy";
@@ -112,6 +120,7 @@ string Enum2Str(Symbol sym) {
 	
 	case Symbol::printfsy: return "printfsy";
 	case Symbol::scanfsy: return "scanfsy";
+	case Symbol::returnsy: return "returnsy";
 	case Symbol::eofsy: return "eofsy";
 	default: return "sym not found";
 	}

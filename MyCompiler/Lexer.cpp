@@ -244,9 +244,11 @@ void Lexer::initial_reserved_word() {
 	reserved_words["while"] = Symbol::whilesy;
 	reserved_words["switch"] = Symbol::switchsy;
 	reserved_words["case"] = Symbol::casesy;
+	reserved_words["default"] = Symbol::defaultsy;
 	// 也可以处理成内置函数，在解析前填入符号表。
 	reserved_words["printf"] = Symbol::printfsy;
 	reserved_words["scanf"] = Symbol::scanfsy;
+	reserved_words["return"] = Symbol::returnsy;
 
 }
 

@@ -2,6 +2,11 @@
 #include <set>
 #include "Token.h"
 typedef set<Symbol> SymSet;
+const SymSet typeSys = {
+	intsy, 
+	charsy,
+	voidsy,
+};
 const SymSet blockBsys = { 
 	Symbol::lbrace, 
 	Symbol::ident 
@@ -21,10 +26,13 @@ const SymSet statementBsys = {
 	Symbol::lbrace,
 	Symbol::ifsy,
 	Symbol::switchsy,
-	Symbol::ident,
+	//Symbol::casesy,
 	Symbol::whilesy,
-	Symbol::printfsy,
 	Symbol::scanfsy,
+	Symbol::printfsy,
+	Symbol::returnsy,
+	Symbol::semicolon,
+	Symbol::ident,
 };
 const SymSet compoundBsys = {
 	Symbol::intsy,
@@ -32,8 +40,13 @@ const SymSet compoundBsys = {
 	Symbol::lbrace,
 	Symbol::ifsy,
 	Symbol::switchsy,
-	Symbol::ident,
+	//Symbol::casesy,
 	Symbol::whilesy,
+	Symbol::printfsy,
+	Symbol::scanfsy,
+	Symbol::returnsy,
+	Symbol::semicolon,
+	Symbol::ident,
 };
 const SymSet factorBsys = {
 	Symbol::intcon,
@@ -58,11 +71,12 @@ const SymSet expBsys = {
 	Symbol::charcon,
 };
 
+
+
+
 const int nkw = 27;  
 const int alng = 10; 
 const int llng = 1024;			// max line length 
-const int emax = 322;
-const int emin = -292;
 const int ilmax = 10;	// integer length max
 const int tmax = 100; 
 const int bmax = 20; 
