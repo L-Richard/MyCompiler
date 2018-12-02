@@ -2,7 +2,7 @@
 #include "MidCodeGen.h"
 #include <sstream>
 
-MidCodeGen::MidCodeGen()
+MidCodeGen::MidCodeGen(SymbolTable&tab) :tab(tab)
 {
 }
 
@@ -34,6 +34,7 @@ SymbolItem* MidCodeGen::genTemp() {
 	r->typ = Type::inttp;
 	r->obj = tmp;
 	r->ident_name = ss.str();
+	tab.enterTemp(r);
 	return r;
 }
 
@@ -46,8 +47,11 @@ SymbolItem* MidCodeGen::genCon(Type typ, int value) {
 		ss << (char)value;
 	}
 	SymbolItem * r = new SymbolItem();
+	r->typ = typ;
+	r->obj = ObjectiveType::constValue;
 	r->ident_name = ss.str();
 	r->addr = value;
+	return r;
 }
 
 SymbolItem* MidCodeGen::genLabel(string s) {
@@ -59,12 +63,19 @@ SymbolItem* MidCodeGen::genLabel(string s) {
 	r->obj = ObjectiveType::label;
 	r->addr = 0;
 	// offset?????????????????????????????????????????????????????????????????????????????????????
+	return r;
 }
 
 void MidCodeGen::setLabel(SymbolItem* label) {
 	Quadruples tmp;
 	tmp.op = Operator::setLabel;
 	tmp.src1 = label;
+	midCodes.push_back(tmp);
+}
+
+void MidCodeGen::emit0(Operator op) {
+	Quadruples tmp;
+	tmp.op = op;
 	midCodes.push_back(tmp);
 }
 
@@ -94,10 +105,20 @@ void MidCodeGen::emit3(Operator op, SymbolItem* src1, SymbolItem* src2, SymbolIt
 
 void MidCodeGen::print() {
 	for (auto item = midCodes.begin(); item != midCodes.end(); item++) {
-		cout << op2Str(item->op);
-		if (item->src1 != NULL) {
-			cout << item->src1->ident_name;
-		}
+		cout << op2Str(item->op) << ", ";
+		if (item->src1 != NULL)
+			cout << item->src1->ident_name << ", ";
+		else 
+			cout << "\t,";
+		if (item->src2 != NULL) 
+			cout << item->src2->ident_name << ", ";
+		else 
+			cout << "\t,";
+		if (item->dst != NULL)
+			cout << item->dst->ident_name << ", ";
+		else
+			cout << "\t,";
+		cout << endl;
 	}
 }
 
@@ -134,7 +155,7 @@ string MidCodeGen::op2Str(Operator op) {
 	case Operator::arrSt: return "arrSt";
 	case Operator::arrLd: return "arrLd";
 
-	case Operator::write: return "write";
+	case Operator::read: return "read";
 	case Operator::print: return "print";
 	}
 }

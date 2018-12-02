@@ -14,7 +14,9 @@ private:
 	Token current_token;	// record a lexem
 	Token type_token;		// record type of a var or const or function
 	Token name_token;
-	bool hasRet;
+	bool hasRet = false;	// if a function defination has return value
+	bool returned = false;	// check last function statement is return
+	SymbolItem* fun_label = NULL;
 
 	void skip(SymSet fsys);		// skip words until current_token's type in fsys,
 	void test(SymSet s1, SymSet s2, int no);	// 

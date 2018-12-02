@@ -43,15 +43,16 @@ struct SymbolItem {
 	SymbolItem* exp_right = NULL;
 	// function 
 	map<string, SymbolItem*> *link = NULL;	// function tab
+	SymbolItem* fun_label = NULL;
 	list<Type> paraList;
+	list<SymbolItem*> tempList;
 	bool hasRet = true;			// 
+	int level = 0;
+
 	int paraSize = 0;			// 
 	int localSize = 0;
-	int level = 0;
+	int tmpSize = 0;
 };
-
-
-
 
 
 
@@ -61,18 +62,27 @@ private:
 	map<string, SymbolItem*> symTab;
 	map<string, SymbolItem*> *ftab = NULL;
 	SymbolItem *lastFunItem = NULL;	// update paraSize and localSize
+
 	/* stack:
 		first, record global variable space
 		then,  record parameters and local variable space
 	*/
-	int stack = 0;	// record global variable space
+	int stack = 0;	// record variable space in function
 	int level = 0;	// 0: global ident. 1: local ident
 public:
-	void enterFunc(Token name_token, enum Type typ);
+	void enterFunc(Token name_token, enum Type typ, SymbolItem* label);
 	void enterVar(Token name_token, enum Type typ, int arraySize);
 	void enterPara(Token name_token, enum Type typ);
 	void enterConst(Token name_token, enum Type typ, int constValue);
+	void enterTemp(SymbolItem* tmp);
 	SymbolItem* search(Token name);
+	int typeSize(Type tp) {
+		switch (tp) {
+		case Type::chartp:	return CHARSIZE;
+		case Type::inttp:	return INTSIZE;
+		default:			return 0;
+		}
+	}
 	void funDone();
 	SymbolTable(Error&error_handler);
 	~SymbolTable();

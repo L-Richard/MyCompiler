@@ -55,13 +55,10 @@ void Parser::testSemicolon() {
 
 }
 
-/*
-void Parser::enter(const Token& t, ObjectiveType obj, bool isGlobal) {
-}
-*/
-
 void Parser::parse() {
 	// parse the whole source file
+	SymbolItem* mainLabel = codeGen.genLabel("main");
+	codeGen.emit1(Operator::jmp, mainLabel);
 	bool varDecDone = false;
 	bool isMain = false;
 	nextSym();
@@ -94,7 +91,8 @@ void Parser::parse() {
 		}
 		// main function
 		if (name_token.getIdentName() == "main") {
-			symTab.enterFunc(name_token, Type::voidtp);
+			codeGen.setLabel(mainLabel);
+			symTab.enterFunc(name_token, Type::voidtp, mainLabel);
 			if (type_token.getSymbol() == Symbol::voidsy && current_token.getSymbol() == Symbol::lparent) {
 				isMain = true;
 				// main function no parameters, no return value;
@@ -375,11 +373,13 @@ SymbolItem* Parser::function() {
 	else 
 		std::cout << "无返回值函数定义" << endl;
 #endif // DEBUG_Gramma_analysis
+	SymbolItem* label = codeGen.genLabel("fun");
+	codeGen.setLabel(label);
 	Type typ = tokenType();
 	if (typ == Type::notp) {
 		error_handler.reportErrorMsg(type_token, 2);
 	}
-	symTab.enterFunc(name_token, typ);
+	symTab.enterFunc(name_token, typ, label);
 	paraList();
 	test({ Symbol::rparent }, compoundBsys, 20);
 	if (current_token.getSymbol() == Symbol::rparent) {
@@ -389,12 +389,21 @@ SymbolItem* Parser::function() {
 	if (current_token.getSymbol() == Symbol::lbrace) {
 		nextSym();
 		compoundstatement();
-		symTab.funDone();
+		if (returned == false && hasRet) {
+			error_handler.reportErrorMsg(current_token, 42);
+		}
+		if (returned == false && !hasRet) {
+			codeGen.emit0(Operator::returnOp);
+		}
 	}
+	//?????????????????????????????????????????????????????????????????????????????????
 	test({ Symbol::rbrace }, compoundBsys, 17);
 	if (current_token.getSymbol() == Symbol::rbrace) {
 		nextSym();
 	}
+	symTab.funDone();
+	//?????????????????????????????????????????????????????????????????????????????????
+	return NULL;
 }
 
 void Parser::compoundstatement() {
@@ -465,11 +474,11 @@ void Parser::statement() {
 			}
 			break;
 		}
-		case Symbol::ifsy:		ifStatement({});	break;
-		case Symbol::switchsy:	switchStatement();	break;
-		case Symbol::whilesy:	whileStatement();	break;
-		case Symbol::scanfsy:	read();				break;
-		case Symbol::printfsy:	write();			break;
+		case Symbol::ifsy:		ifStatement({});	returned = false;	break;
+		case Symbol::switchsy:	switchStatement();	returned = false;	break;
+		case Symbol::whilesy:	whileStatement();	returned = false;	break;
+		case Symbol::scanfsy:	read();				returned = false;	break;
+		case Symbol::printfsy:	write();			returned = false;	break;
 		case Symbol::returnsy:	returnStatement();	break;
 		case Symbol::semicolon: {
 #ifdef DEBUG_Gramma_analysis
@@ -500,7 +509,7 @@ void Parser::statement() {
 				if (current_token.getSymbol() == lparent) {
 					SymSet fsys = statementBsys;
 					fsys.insert({ Symbol::semicolon, Symbol::rbrace });
-					call(fsys, codeGen.genTemp());
+					call(fsys, tmp);
 					codeGen.emit1(Operator::call, tmp);
 					testSemicolon();
 				}
@@ -535,6 +544,7 @@ void Parser::statement() {
 				error_handler.reportErrorMsg(name_token, 24);
 				skip(statementBsys);
 			}
+			returned = false;
 			break;
 		}
 		default: break;		// 默认是空白语句
@@ -594,12 +604,14 @@ void Parser::returnStatement() {
 				testSemicolon();
 			}
 			codeGen.emit1(Operator::returnOp, r);
+			returned = true;
 		}
 	}
 	else {		// function without return
 		testSemicolon();
+		codeGen.emit0(Operator::returnOp);
+		returned = true;
 	}
-	codeGen.emit0(Operator::returnOp);
 }
 
 SymbolItem* Parser::assignStatement() {
@@ -612,7 +624,7 @@ SymbolItem* Parser::assignStatement() {
 	SymSet fsys = statementBsys;
 	fsys.insert({ Symbol::rbrace, Symbol::semicolon });
 	fsys.insert(expBsys.begin(), expBsys.end());
-	SymbolItem* r;
+	SymbolItem* r = NULL;
 	test({ Symbol::becomes }, fsys, 10);
 	if (current_token.getSymbol() == Symbol::becomes) {
 		nextSym();
@@ -620,6 +632,9 @@ SymbolItem* Parser::assignStatement() {
 	}
 	// do something
 	testSemicolon();
+	if (r == NULL) {
+		r = new SymbolItem();
+	}
 	return r;
 }
 
@@ -631,18 +646,17 @@ void Parser::ifStatement(SymSet fsys) {
 #endif // DEBUG_Gramma_analysis
 	SymbolItem* tmpCondition = NULL;
 	SymbolItem* endifLabel = codeGen.genLabel("end_if");
-
 	fsys.insert(statementBsys.begin(), statementBsys.end());
-	fsys.insert({ Symbol::lbrace });
+	fsys.insert({ Symbol::lbrace, Symbol::rbrace });
 	nextSym();
-	test({ Symbol::lparent }, statementBsys, 0);
+	test({ Symbol::lparent }, statementBsys, 19);
 	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
 		tmpCondition = condition();
 
 		codeGen.emit2(Operator::jez, tmpCondition, endifLabel);
 		/////////////////////////////////////////////////////////////////
-
+		test({ Symbol::rparent }, fsys, 20);
 		if (current_token.getSymbol() == Symbol::rparent) {
 			nextSym();
 		}
@@ -653,7 +667,6 @@ void Parser::ifStatement(SymSet fsys) {
 			std::cout << "出错：不是语句开头符号!" << endl;
 #endif // DEBUG_Gramma_analysis
 		}
-		test(statementBsys, compoundBsys, 0);
 		if (statementBsys.count(current_token.getSymbol())) {
 			statement();
 		}
@@ -742,12 +755,13 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 		if (sy == Symbol::charcon) {
 			ty = Type::chartp;
 			conVal = current_token.getConstChar();
-			constValue = codeGen.genCon(Type::chartp, conVal);
+			constValue = codeGen.genCon(ty, conVal);
+			nextSym();
 		}
 		else {
-			ty = Type::chartp;
+			ty = Type::inttp;
 			conVal = this->signedInt(fsys);
-			constValue = codeGen.genCon(Type::inttp, conVal);
+			constValue = codeGen.genCon(ty, conVal);
 		}
 		if (caseTab->count(conVal) && (*caseTab)[conVal] == ty) {
 			error_handler.reportErrorMsg(current_token, 41);
@@ -831,15 +845,12 @@ void Parser::whileStatement() {
 
 
 SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
+	/*	begin with left parent, end with semicolon. */
 #ifdef DEBUG_Gramma_analysis
 	int lc = current_token.getlc();
 	std::cout << lc << "行: ";
 	std::cout << "call 语句" << endl;
 #endif // DEBUG_Gramma_analysis
-	/*
-	begin with left parent, end with semicolon.
-
-	*/
 	codeGen.emit0(Operator::mark);	// 标记当前pc，保存现场
 	SymbolItem* r = NULL;
 	SymbolItem* para = NULL;
@@ -885,6 +896,7 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 			nextSym();
 		}
 	}
+	codeGen.emit1(Operator::call, funItem->fun_label);
 	return r;
 }
 
@@ -905,7 +917,7 @@ void Parser::read() {
 			test({ Symbol::ident }, fsys, 7);
 			if (current_token.getSymbol() == Symbol::ident) {
 				SymbolItem* tmpItem = symTab.search(current_token);
-				codeGen.emit1(Operator::write, tmpItem);
+				codeGen.emit1(Operator::read, tmpItem);
 				nextSym();
 			}
 			if (current_token.getSymbol() == Symbol::rparent) {
@@ -1159,14 +1171,15 @@ SymbolItem* Parser::factor(SymSet fsys) {
 		}
 		case Symbol::charcon: {
 			// do something
-			nextSym();
 			SymbolItem* r = codeGen.genCon(Type::chartp, current_token.getConstChar());
+			nextSym();
 			return r;
 			break;
 		}
 		case Symbol::lparent: {
 			nextSym();
 			SymbolItem * r = expression(fsys);
+			r->typ = Type::inttp;
 			test({ rparent }, fsys, 0);
 			if (current_token.getSymbol() == rparent) {
 				nextSym();

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-enum Operator {
+enum class Operator {
 	notOp,
 	assignOp,
 	minus, plus, times, slash, neg,
@@ -14,20 +14,9 @@ enum Operator {
 						// jmp: no condition
 						// jeq: jump if condition is false;
 	call, returnOp, mark, stPara, 
-	load, store,	// 
+	load, store,		// 
 	arrLd, arrSt,		// array read and write
-	write, print,
-};
-
-enum StandType {
-	booltp, inttp, chartp, 
-	stringtp, nottp,
-};
-
-struct ExpItem {
-	StandType valueTp = StandType::nottp;
-	int value;						// compute result
-	SymbolItem *symbolItem = NULL;	// pointing to var in the sym Table
+	read, print,
 };
 
 struct Quadruples {
@@ -52,6 +41,7 @@ struct SymbolItem {
 
 class MidCodeGen {
 	vector<Quadruples> midCodes;
+	SymbolTable &tab;
 	int tmp_n = 0;
 	int label_n;
 	int if_n = 0;
@@ -85,7 +75,10 @@ public:
 	void print();
 	string op2Str(Operator op);
 
-	MidCodeGen();
+	vector<Quadruples>& getMidCodes() {
+		return midCodes;
+	}
+	MidCodeGen(SymbolTable &tab);
 
 	~MidCodeGen();
 };

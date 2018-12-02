@@ -155,6 +155,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="MidCodeGen.h" />
+    <ClInclude Include="mipsObjCode.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="MidCodeGen.cpp" />
+    <ClCompile Include="mipsObjCode.cpp" />
     <ClCompile Include="MyCompiler.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="pch.cpp">
