@@ -157,6 +157,7 @@
     <ClInclude Include="MidCodeGen.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="Token.h" />
   </ItemGroup>
@@ -174,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="SymbolTable.cpp" />
     <ClCompile Include="Token.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MyCompiler.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

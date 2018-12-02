@@ -62,6 +62,7 @@ Token Lexer::getSym() {
 		bool isZero = ch == '0';	// if first number is zero
 		int numLength = 0;
 		do {
+			ident_name.push_back(ch);
 			inum = inum * 10 + ch - '0';
 			numLength++;
 			getch();

@@ -3,55 +3,49 @@
 #include "MidCodeGen.h"
 #include "SymbolTable.h"
 #include "Const.h"
+
 class Parser {
 private:
 	Lexer* lexer;
 	Error& error_handler;
 	MidCodeGen& codeGen;
-//	SymbolTable& symTab;
-	Token current_token;		// record a lexem
+	SymbolTable& symTab;
+
+	Token current_token;	// record a lexem
 	Token type_token;		// record type of a var or const or function
 	Token name_token;
-
-	// symbol table: 
-	vector<SymbolItem> symTab;
-
-	// function: need btab, return flag
 	bool hasRet;
 
-	// need to record an identifier's Symbol type, adr,  
-
-	class item {
-		// record expression msg
-
-	};
 	void skip(SymSet fsys);		// skip words until current_token's type in fsys,
 	void test(SymSet s1, SymSet s2, int no);	// 
 	void testSemicolon();
-	void enter(const Token& t, ObjectiveType obj, bool isGlobal);
-	// search table for a 
-	int searchTab(const Token& identifier);	
 	void nextSym();
+	Type tokenType();
 	
 	void constDefinition();
 	void varDeclaration();
 	int  signedInt(SymSet fsys);
-	void selector();
+	SymbolItem* selector(SymSet fsys);		//* return the index: [exp], 
 	void paraList();
-	void function();
+	SymbolItem* function();
 	void statement();
-	void condition();
-	void expression();
-	void item(SymSet fsys);
-	void factor(SymSet fsys);
+	SymbolItem* condition();
+	SymbolItem* expression(SymSet fsys);
+	SymbolItem* item(SymSet fsys);
+	SymbolItem* factor(SymSet fsys);
 	void ifStatement(SymSet fsys);
 	void switchStatement();
-	void caseStatement();
+	/* switch -> if else */
+	void caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int, Type> *caseTab);
+	/* return const value, and check duplication
+	SymbolItem *expItem, *endSwitchLabel, */
 	void defaultStatement();
+	// just do it, no jmp
 	void whileStatement();
-	void call();
+	SymbolItem* call(SymSet fsys, SymbolItem* funItem);
+	// funItem is self SymbolItem
 	void returnStatement();
-	void assignStatement();
+	SymbolItem* assignStatement();
 	void multiStatement();
 	void compoundstatement();
 	void read();
@@ -59,9 +53,7 @@ private:
 
 public:
 	void parse();
-	Parser(Lexer* lexer, Error& error_handler, MidCodeGen& codeGen);
-//, SymbolTable& symTab);
-//	Parser(Lexer &lexer, Error &error_handler, MidCodeGen &codeGen, SymbolTable &symTab);
+	Parser(Lexer* lexer, Error& error_handler, MidCodeGen& codeGen, SymbolTable &symTab);
 	~Parser();
 };
 

@@ -22,11 +22,19 @@ const SymSet globalVarDecFsys = {
 	Symbol::charsy,
 	Symbol::voidsy,
 };
+const SymSet itemBsys = {
+};
+const SymSet conValueBsys = {
+	Symbol::intcon,
+	Symbol::charcon,
+	Symbol::plus,
+	Symbol::minus,
+};
 const SymSet statementBsys = {
 	Symbol::lbrace,
 	Symbol::ifsy,
 	Symbol::switchsy,
-	//Symbol::casesy,
+	// Symbol::casesy,	// case后面可能是空语句，可能执行下个case
 	Symbol::whilesy,
 	Symbol::scanfsy,
 	Symbol::printfsy,
@@ -40,7 +48,7 @@ const SymSet compoundBsys = {
 	Symbol::lbrace,
 	Symbol::ifsy,
 	Symbol::switchsy,
-	//Symbol::casesy,
+	// Symbol::casesy,
 	Symbol::whilesy,
 	Symbol::printfsy,
 	Symbol::scanfsy,
@@ -48,14 +56,8 @@ const SymSet compoundBsys = {
 	Symbol::semicolon,
 	Symbol::ident,
 };
-const SymSet factorBsys = {
-	Symbol::intcon,
-	Symbol::charcon,
-	Symbol::ident,
-	Symbol::lparent
-};
 const SymSet logicalOperatorSys = {
-	Symbol::	eql, 
+	Symbol::eql, 
 	Symbol::neq, 
 	Symbol::gtr, 
 	Symbol::geq, 
@@ -73,10 +75,11 @@ const SymSet expBsys = {
 
 
 
-
+const int INTSIZE = 4;
+const int CHARSIZE = 1;
 const int nkw = 27;  
 const int alng = 10; 
-const int llng = 1024;			// max line length 
+const int llng = 1024;	// max line length 
 const int ilmax = 10;	// integer length max
 const int tmax = 100; 
 const int bmax = 20; 

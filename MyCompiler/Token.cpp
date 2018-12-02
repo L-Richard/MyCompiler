@@ -73,11 +73,10 @@ string Token::getString() {
 	}
 }
 
-
-
 Token::~Token()
 {
 }
+
 string Enum2Str(Symbol sym) {
 	switch (sym) {
 	case notsy: return "notsy";
