@@ -137,9 +137,7 @@ string MidCodeGen::op2Str(Operator op) {
 	case Operator::leq: return "leq";
 	case Operator::eql: return "eql";
 	case Operator::neq: return "neq";
-
 	case Operator::jmp: return "jmp";
-	case Operator::jeq: return "jeq";
 	case Operator::jne: return "jne";
 	case Operator::jez: return "jez";
 	case Operator::setLabel: return "setLabel";
@@ -148,13 +146,11 @@ string MidCodeGen::op2Str(Operator op) {
 	case Operator::returnOp: return "return";
 	case Operator::mark: return "mark";
 	case Operator::stPara: return "stPara";
+	case Operator::stRetVal: return "stRetVal";
 
 	case Operator::load: return "load";
 	case Operator::store: return "store";
 		
-	case Operator::arrSt: return "arrSt";
-	case Operator::arrLd: return "arrLd";
-
 	case Operator::read: return "read";
 	case Operator::print: return "print";
 	}

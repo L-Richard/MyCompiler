@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="Const.h" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="Instruction.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="MidCodeGen.h" />
     <ClInclude Include="mipsObjCode.h" />
@@ -164,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="Instruction.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="MidCodeGen.cpp" />
     <ClCompile Include="mipsObjCode.cpp" />

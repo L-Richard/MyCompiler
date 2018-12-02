@@ -8,14 +8,14 @@ enum class Operator {
 	notOp,
 	assignOp,
 	minus, plus, times, slash, neg,
-	gtr, geq, les, leq, eql, neq,
-	jmp, jeq, jne, jez, 
+	gtr, geq, les, leq, eql, neq,	// if condition is true then jump to label
+	jmp, jne, jez, 
 	setLabel,
 						// jmp: no condition
 						// jeq: jump if condition is false;
-	call, returnOp, mark, stPara, 
+	call, returnOp, mark, stRa,
+	stPara, stRetVal, 
 	load, store,		// 
-	arrLd, arrSt,		// array read and write
 	read, print,
 };
 

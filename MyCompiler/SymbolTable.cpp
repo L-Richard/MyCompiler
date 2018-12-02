@@ -66,7 +66,7 @@ void SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize) {
 		else {
 			(*ftab)[name] = item;
 			item->addr = stack;
-			lastFunItem->localSize += tmpSize;
+			lastFunItem->totalSize += tmpSize;
 			stack += tmpSize;
 		}
 	}
@@ -80,6 +80,8 @@ void SymbolTable::enterTemp(SymbolItem* tmp) {
 #endif // DEBUG
 	}
 	(*ftab)[tmp->ident_name] = tmp;
+	lastFunItem->tmpSize += INTSIZE;
+	lastFunItem->totalSize += INTSIZE;
 	tmp->level = 1;
 	tmp->addr = stack;
 	stack += INTSIZE;
@@ -89,7 +91,6 @@ void SymbolTable::enterPara(Token name_token, enum Type typ) {
 	string name = name_token.getIdentName();
 	enterVar(name_token, typ, 0);
 	lastFunItem->paraSize += typeSize(typ);
-	lastFunItem->localSize -= typeSize(typ);	// 调用enterVar多加了一次
 	lastFunItem->paraList.push_back(typ);
 }
 
@@ -147,6 +148,6 @@ void SymbolTable::funDone() {
 	ftab = NULL;
 	lastFunItem = NULL;
 	level = 0;
-	stack = 0;
+	stack = 8;
 }
 

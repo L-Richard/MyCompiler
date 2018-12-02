@@ -375,6 +375,7 @@ SymbolItem* Parser::function() {
 #endif // DEBUG_Gramma_analysis
 	SymbolItem* label = codeGen.genLabel("fun");
 	codeGen.setLabel(label);
+	codeGen.emit1(Operator::stRa, symTab.getFunItem());
 	Type typ = tokenType();
 	if (typ == Type::notp) {
 		error_handler.reportErrorMsg(type_token, 2);
@@ -393,7 +394,7 @@ SymbolItem* Parser::function() {
 			error_handler.reportErrorMsg(current_token, 42);
 		}
 		if (returned == false && !hasRet) {
-			codeGen.emit0(Operator::returnOp);
+			codeGen.emit1(Operator::returnOp, symTab.getFunItem());
 		}
 	}
 	//?????????????????????????????????????????????????????????????????????????????????
@@ -603,13 +604,13 @@ void Parser::returnStatement() {
 				nextSym();
 				testSemicolon();
 			}
-			codeGen.emit1(Operator::returnOp, r);
+			codeGen.emit2(Operator::returnOp, symTab.getFunItem(), r);
 			returned = true;
 		}
 	}
 	else {		// function without return
 		testSemicolon();
-		codeGen.emit0(Operator::returnOp);
+		codeGen.emit1(Operator::returnOp, symTab.getFunItem());
 		returned = true;
 	}
 }
@@ -644,7 +645,6 @@ void Parser::ifStatement(SymSet fsys) {
 	std::cout << lc << "行: ";
 	std::cout << "if 语句" << endl;
 #endif // DEBUG_Gramma_analysis
-	SymbolItem* tmpCondition = NULL;
 	SymbolItem* endifLabel = codeGen.genLabel("end_if");
 	fsys.insert(statementBsys.begin(), statementBsys.end());
 	fsys.insert({ Symbol::lbrace, Symbol::rbrace });
@@ -652,9 +652,7 @@ void Parser::ifStatement(SymSet fsys) {
 	test({ Symbol::lparent }, statementBsys, 19);
 	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
-		tmpCondition = condition();
-
-		codeGen.emit2(Operator::jez, tmpCondition, endifLabel);
+		condition(endifLabel);
 		/////////////////////////////////////////////////////////////////
 		test({ Symbol::rparent }, fsys, 20);
 		if (current_token.getSymbol() == Symbol::rparent) {
@@ -830,8 +828,7 @@ void Parser::whileStatement() {
 	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
 		codeGen.setLabel(start_while);
-		tmpCondition = condition();
-		codeGen.emit2(Operator::jez, tmpCondition, end_while);
+		condition(end_while);	// jump if condition is false
 		test({ Symbol::rparent }, statementBsys, 20);
 		if (current_token.getSymbol() == Symbol::rparent) {
 			nextSym();
@@ -851,16 +848,10 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 	std::cout << lc << "行: ";
 	std::cout << "call 语句" << endl;
 #endif // DEBUG_Gramma_analysis
-	codeGen.emit0(Operator::mark);	// 标记当前pc，保存现场
-	SymbolItem* r = NULL;
+	codeGen.emit1(Operator::mark, funItem);	// 标记当前pc，保存现场
 	SymbolItem* para = NULL;
 	list<Type> paraTyps = funItem->paraList;
-	if (funItem->hasRet) {
-		r = codeGen.genTemp();
-	}
-	else {
-		r = new SymbolItem();
-	}
+
 
 	test({ lparent }, fsys, 19);
 	if (current_token.getSymbol() == lparent) {
@@ -872,6 +863,9 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 			para = expression(fsys);
 			if (*typ == Type::chartp && para->typ == Type::inttp) {
 				error_handler.reportErrorMsg(error_token, 39);
+			}
+			if (*typ == Type::inttp) {
+				para->typ = Type::inttp;
 			}
 			if (para->typ != Type::notp) {
 				codeGen.emit1(Operator::stPara, para);
@@ -897,7 +891,14 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 		}
 	}
 	codeGen.emit1(Operator::call, funItem->fun_label);
-	return r;
+	if (funItem->hasRet) {
+		SymbolItem* returnValue = codeGen.genTemp();
+		codeGen.emit1(Operator::stRetVal, returnValue);
+		return returnValue;
+	}
+	else {
+		return new SymbolItem();
+	}
 }
 
 void Parser::read() {
@@ -1005,7 +1006,7 @@ void Parser::write() {
 	}
 }
 
-SymbolItem* Parser::condition() {
+void Parser::condition(SymbolItem* label) {
 #ifdef DEBUG_Gramma_analysis
 	int lc = current_token.getlc();
 	std::cout << lc << "行: ";
@@ -1013,10 +1014,11 @@ SymbolItem* Parser::condition() {
 #endif // DEBUG_Gramma_analysis
 	SymSet fsys = statementBsys;
 	fsys.insert({ rparent, rbrace });
+
 	SymbolItem* exp1 = expression(fsys);
 	SymbolItem* exp2 = NULL;
-	SymbolItem* r = NULL;
 	Symbol sy = current_token.getSymbol();
+	Token syToken = current_token;
 	if (logicalOperatorSys.count(sy)) {
 		nextSym();
 		exp2 = expression(fsys);
@@ -1027,12 +1029,12 @@ SymbolItem* Parser::condition() {
 		if (tpSet.count(exp1->typ) &&  tpSet.count(exp2->typ) && exp1->typ != exp2->typ) {
 			error_handler.reportErrorMsg(current_token, 30);
 		}
-		r = codeGen.genTemp();
-		Operator op = Operator::notOp;
-		op = codeGen.symbol2Operator(sy);
-		codeGen.emit3(op, exp1, exp2, r);
+		Operator op = codeGen.symbol2Operator(sy);
+		codeGen.emit3(op, exp1, exp2, label);
 	}
-	return r;
+	else {
+		codeGen.emit2(Operator::jez, exp1, label);
+	}
 }
 
 SymbolItem* Parser::expression(SymSet fsys) {
@@ -1128,7 +1130,7 @@ SymbolItem* Parser::factor(SymSet fsys) {
 				case ObjectiveType::arrayty: {
 					SymbolItem* offset = selector(fsys);
 					SymbolItem* r = codeGen.genTemp();
-					codeGen.emit3(Operator::arrLd, tmpItem, offset, r);
+					codeGen.emit3(Operator::assignOp, r, offset, tmpItem);
 					return r;
 					break;
 				}

@@ -31,7 +31,7 @@ private:
 	void paraList();
 	SymbolItem* function();
 	void statement();
-	SymbolItem* condition();
+	void condition(SymbolItem* label);
 	SymbolItem* expression(SymSet fsys);
 	SymbolItem* item(SymSet fsys);
 	SymbolItem* factor(SymSet fsys);

@@ -50,7 +50,7 @@ struct SymbolItem {
 	int level = 0;
 
 	int paraSize = 0;			// 
-	int localSize = 0;
+	int totalSize = 0;		// totalSize = paraSize + tmpSize
 	int tmpSize = 0;
 };
 
@@ -67,7 +67,7 @@ private:
 		first, record global variable space
 		then,  record parameters and local variable space
 	*/
-	int stack = 0;	// record variable space in function
+	int stack = 8;	// record variable space in function
 	int level = 0;	// 0: global ident. 1: local ident
 public:
 	void enterFunc(Token name_token, enum Type typ, SymbolItem* label);
@@ -84,6 +84,9 @@ public:
 		}
 	}
 	void funDone();
+	SymbolItem* getFunItem() {
+		return lastFunItem;
+	}
 	SymbolTable(Error&error_handler);
 	~SymbolTable();
 };
