@@ -3,6 +3,7 @@
 #include "MidCodeGen.h"
 #include "SymbolTable.h"
 #include "Const.h"
+#include <sstream>
 
 class Parser {
 private:
@@ -16,7 +17,9 @@ private:
 	Token name_token;
 	bool hasRet = false;	// if a function defination has return value
 	bool returned = false;	// check last function statement is return
-	SymbolItem* fun_label = NULL;
+	bool isMain = false;
+	SymbolItem* mainLabel = codeGen.genLabel(labelType::main_lb);
+	SymbolItem* endMainLabel = codeGen.genLabel(labelType::end_main_lb);
 
 	void skip(SymSet fsys);		// skip words until current_token's type in fsys,
 	void test(SymSet s1, SymSet s2, int no);	// 
@@ -53,6 +56,11 @@ private:
 	void read();
 	void write();
 
+	string int2str(int i) {
+		stringstream ss;
+		ss << i;
+		return ss.str();
+	}
 public:
 	void parse();
 	Parser(Lexer* lexer, Error& error_handler, MidCodeGen& codeGen, SymbolTable &symTab);

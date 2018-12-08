@@ -13,10 +13,19 @@ private:
 		int type;	// 出错类型
 	};
 	vector<ErrorMsg> errorMsgs;
-	bool noError = true;
 public:
 	void reportErrorMsg(int cc, int lc, int type, string error_msg="");
 	void reportErrorMsg(Token &t, int type, string error_msg="");
+	bool hasError() {
+		return errorMsgs.size() > 0;
+	}
+
+	void print() {
+		for (auto item = errorMsgs.begin(); item != errorMsgs.end(); item++) {
+			cout << "Error: " << item->lc << "行, " << item->cc << "列: " << "error type: "
+				<< item->type;
+		}
+	}
 	Error();
 	~Error();
 };

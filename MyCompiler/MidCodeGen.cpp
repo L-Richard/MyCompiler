@@ -15,15 +15,16 @@ MidCodeGen::~MidCodeGen()
 Operator MidCodeGen::symbol2Operator(Symbol sy) {
 	switch (sy) {
 	case Symbol::minus: return Operator::minus;
-	case Symbol::plus: return Operator::plus;
-	case Symbol::times: return Operator::times;
-	case Symbol::slash: return Operator::slash;
-	case Symbol::eql: return Operator::eql;
-	case Symbol::neq: return Operator::neq;
-	case Symbol::gtr: return Operator::gtr;
-	case Symbol::geq: return Operator::geq;
-	case Symbol::les: return Operator::les;
-	case Symbol::leq: return Operator::leq;
+	case Symbol::plus:	return Operator::plus;
+	case Symbol::times:	return Operator::times;
+	case Symbol::slash:	return Operator::slash;
+	case Symbol::eql:	return Operator::eql;
+	case Symbol::neq:	return Operator::neq;
+	case Symbol::gtr:	return Operator::gtr;
+	case Symbol::geq:	return Operator::geq;
+	case Symbol::les:	return Operator::les;
+	case Symbol::leq:	return Operator::leq;
+	default:			return Operator::notOp;
 	}
 }
 
@@ -48,53 +49,31 @@ SymbolItem* MidCodeGen::genCon(Type typ, int value) {
 	}
 	SymbolItem * r = new SymbolItem();
 	r->typ = typ;
-	r->obj = ObjectiveType::constValue;
+	r->obj = ObjectiveType::constty;
 	r->ident_name = ss.str();
 	r->addr = value;
 	return r;
 }
 
-SymbolItem* MidCodeGen::genLabel(string s) {
+SymbolItem* MidCodeGen::genLabel(labelType l) {
 	SymbolItem * r = new SymbolItem();
 	stringstream ss;
-	ss << s << label_n++;
+	ss << label2str(l) << label_n++;
 	r->ident_name = ss.str();
-
+	r->lab = l;
 	r->obj = ObjectiveType::label;
 	r->addr = 0;
-	// offset?????????????????????????????????????????????????????????????????????????????????????
 	return r;
 }
 
 void MidCodeGen::setLabel(SymbolItem* label) {
 	Quadruples tmp;
 	tmp.op = Operator::setLabel;
-	tmp.src1 = label;
+	tmp.dst = label;
 	midCodes.push_back(tmp);
 }
 
-void MidCodeGen::emit0(Operator op) {
-	Quadruples tmp;
-	tmp.op = op;
-	midCodes.push_back(tmp);
-}
-
-void MidCodeGen::emit1(Operator op, SymbolItem* src1) {
-	Quadruples tmp;
-	tmp.op = op;
-	tmp.src1 = src1;
-	midCodes.push_back(tmp);
-}
-
-void MidCodeGen::emit2(Operator op, SymbolItem* src1, SymbolItem* dst) {
-	Quadruples tmp;
-	tmp.op = op;
-	tmp.src1 = src1;
-	tmp.dst = dst;
-	midCodes.push_back(tmp);
-}
-
-void MidCodeGen::emit3(Operator op, SymbolItem* src1, SymbolItem* src2, SymbolItem* dst) {
+void MidCodeGen::emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem* src2) {
 	Quadruples tmp;
 	tmp.op = op;
 	tmp.src1 = src1;
@@ -124,34 +103,38 @@ void MidCodeGen::print() {
 
 string MidCodeGen::op2Str(Operator op) {
 	switch (op) {
-	case Operator::assignOp: return "assign";
-	case Operator::minus: return "minus";
-	case Operator::plus: return "plus";
-	case Operator::times: return "times";
-	case Operator::slash: return "slash";
-	case Operator::neg: return "neg";
+	// calculate
+	case Operator::assignOp:return "assign";
+	case Operator::minus:	return "minus";
+	case Operator::plus:	return "plus";
+	case Operator::times:	return "times";
+	case Operator::slash:	return "slash";
+	case Operator::neg:		return "neg";
+	// branch 
+	case Operator::gtr:		return "gtr";
+	case Operator::geq:		return "geq";
+	case Operator::les:		return "les";
+	case Operator::leq:		return "leq";
+	case Operator::eql:		return "eql";
+	case Operator::neq:		return "neq";
+	// jump
+	case Operator::jmp:		return "jmp";
+	case Operator::jez:		return "jez";
+	case Operator::setLabel:return "setLabel";
+	// call function
+	case Operator::save:	return "save";
+	case Operator::stPara:	return "stPara";
+	case Operator::call:	return "call";
+	case Operator::st$ra:	return "st$ra";
+	case Operator::returnOp:return "return";
+	case Operator::stRetVal:return "stRetVal";
+	case Operator::restore: return "restore";
 
-	case Operator::gtr: return "gtr";
-	case Operator::geq: return "geq";
-	case Operator::les: return "les";
-	case Operator::leq: return "leq";
-	case Operator::eql: return "eql";
-	case Operator::neq: return "neq";
-	case Operator::jmp: return "jmp";
-	case Operator::jne: return "jne";
-	case Operator::jez: return "jez";
-	case Operator::setLabel: return "setLabel";
-
-	case Operator::call: return "call";
-	case Operator::returnOp: return "return";
-	case Operator::mark: return "mark";
-	case Operator::stPara: return "stPara";
-	case Operator::stRetVal: return "stRetVal";
-
-	case Operator::load: return "load";
-	case Operator::store: return "store";
+	case Operator::arrLd:	return "arrLd";
+	case Operator::arrSt:	return "arrSt";
 		
-	case Operator::read: return "read";
-	case Operator::print: return "print";
+	case Operator::read:	return "read";
+	case Operator::print:	return "print";
+	default:				return "foo_Operator";
 	}
 }

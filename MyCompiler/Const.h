@@ -22,8 +22,6 @@ const SymSet globalVarDecFsys = {
 	Symbol::charsy,
 	Symbol::voidsy,
 };
-const SymSet itemBsys = {
-};
 const SymSet conValueBsys = {
 	Symbol::intcon,
 	Symbol::charcon,
@@ -57,6 +55,7 @@ const SymSet compoundBsys = {
 	Symbol::ident,
 };
 const SymSet logicalOperatorSys = {
+	// 二元逻辑运算符集合
 	Symbol::eql, 
 	Symbol::neq, 
 	Symbol::gtr, 

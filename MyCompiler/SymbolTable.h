@@ -3,23 +3,7 @@
 #include <string>
 #include "Const.h"
 #include "Error.h"
-enum ObjectiveType {
-	noty,
-	constty,	// defined const, with a name
-	varty,
-	functy,
-	arrayty,
-	tmp,		// tmp
-	constValue,	// const in expression
-	label,
-};
-enum Type {
-	notp,
-	chartp,
-	inttp,
-	stringtp,
-	voidtp,
-};
+#include "c0_enum.h"
 /*
 struct bTabItem {
 	std::string ident_name = "";
@@ -37,6 +21,9 @@ struct SymbolItem {
 	enum Type typ = notp;
 	int addr = 0;	// varibale: offset from base of this block
 					// constant: char ascii or sigend integer
+	// array
+	int arrayNumMax = 0;
+	int varSize = 0;
 	// expItem, DAG graph
 	bool isConst = false;
 	SymbolItem* exp_left = NULL;
@@ -45,12 +32,14 @@ struct SymbolItem {
 	map<string, SymbolItem*> *link = NULL;	// function tab
 	SymbolItem* fun_label = NULL;
 	list<Type> paraList;
-	list<SymbolItem*> tempList;
-	bool hasRet = true;			// 
+	list<SymbolItem*> paras;
+	bool hasRet = false;			// 
 	int level = 0;
+	// label
+	labelType lab;
 
-	int paraSize = 0;			// 
 	int totalSize = 0;		// totalSize = paraSize + tmpSize
+	int paraSize = 0;		// 
 	int tmpSize = 0;
 };
 
@@ -67,7 +56,7 @@ private:
 		first, record global variable space
 		then,  record parameters and local variable space
 	*/
-	int stack = 8;	// record variable space in function
+	int stack = 4;	// 4: $ra. record variable space in function
 	int level = 0;	// 0: global ident. 1: local ident
 public:
 	void enterFunc(Token name_token, enum Type typ, SymbolItem* label);
@@ -76,6 +65,15 @@ public:
 	void enterConst(Token name_token, enum Type typ, int constValue);
 	void enterTemp(SymbolItem* tmp);
 	SymbolItem* search(Token name);
+	void funDone();
+
+	void align() {
+		int r = stack % 4;
+		int q = stack / 4;
+		if (r != 0) {
+			stack += 4 - r;
+		}
+	}
 	int typeSize(Type tp) {
 		switch (tp) {
 		case Type::chartp:	return CHARSIZE;
@@ -83,10 +81,14 @@ public:
 		default:			return 0;
 		}
 	}
-	void funDone();
+
 	SymbolItem* getFunItem() {
 		return lastFunItem;
 	}
+	map<string, SymbolItem*>& getTab() {
+		return symTab;
+	}
+
 	SymbolTable(Error&error_handler);
 	~SymbolTable();
 };

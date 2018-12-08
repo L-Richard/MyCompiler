@@ -57,10 +57,8 @@ void Parser::testSemicolon() {
 
 void Parser::parse() {
 	// parse the whole source file
-	SymbolItem* mainLabel = codeGen.genLabel("main");
-	codeGen.emit1(Operator::jmp, mainLabel);
+	codeGen.emit(Operator::jmp, mainLabel, NULL, NULL);
 	bool varDecDone = false;
-	bool isMain = false;
 	nextSym();
 	// check type 
 	test({ voidsy, intsy, charsy, constsy }, statementBsys, 1);
@@ -104,11 +102,11 @@ void Parser::parse() {
 				test({ lbrace }, compoundBsys, 5);
 				if (current_token.getSymbol() == lbrace) {
 					hasRet = false;
-					test(compoundBsys, {}, 0);
+					test(compoundBsys, {Symbol::rbrace}, 0);
 					if (compoundBsys.count(current_token.getSymbol())) {
 						nextSym();
-				// set start pc, 
 						compoundstatement();
+						codeGen.setLabel(endMainLabel);
 					}
 					test({ rbrace }, { eofsy }, 17);
 					if (current_token.getSymbol() == rbrace) {
@@ -119,7 +117,6 @@ void Parser::parse() {
 			}
 			else {
 				error_handler.reportErrorMsg(name_token, 3);
-				// error:
 			}
 			break;
 		}
@@ -184,6 +181,7 @@ int Parser::signedInt(SymSet fsys) {
 			return 0;
 		}
 	}
+	return 0;
 }
 
 void Parser::constDefinition() {
@@ -373,9 +371,9 @@ SymbolItem* Parser::function() {
 	else 
 		std::cout << "无返回值函数定义" << endl;
 #endif // DEBUG_Gramma_analysis
-	SymbolItem* label = codeGen.genLabel("fun");
+	SymbolItem* label = codeGen.genLabel(labelType::fun_lb);
 	codeGen.setLabel(label);
-	codeGen.emit1(Operator::stRa, symTab.getFunItem());
+	codeGen.emit(Operator::st$ra, symTab.getFunItem(), NULL, NULL);
 	Type typ = tokenType();
 	if (typ == Type::notp) {
 		error_handler.reportErrorMsg(type_token, 2);
@@ -394,7 +392,7 @@ SymbolItem* Parser::function() {
 			error_handler.reportErrorMsg(current_token, 42);
 		}
 		if (returned == false && !hasRet) {
-			codeGen.emit1(Operator::returnOp, symTab.getFunItem());
+			codeGen.emit(Operator::returnOp, symTab.getFunItem(), NULL, NULL);
 		}
 	}
 	//?????????????????????????????????????????????????????????????????????????????????
@@ -475,9 +473,9 @@ void Parser::statement() {
 			}
 			break;
 		}
-		case Symbol::ifsy:		ifStatement({});	returned = false;	break;
-		case Symbol::switchsy:	switchStatement();	returned = false;	break;
-		case Symbol::whilesy:	whileStatement();	returned = false;	break;
+		case Symbol::ifsy:		ifStatement({});	break;
+		case Symbol::switchsy:	switchStatement();	break;
+		case Symbol::whilesy:	whileStatement();	break;
 		case Symbol::scanfsy:	read();				returned = false;	break;
 		case Symbol::printfsy:	write();			returned = false;	break;
 		case Symbol::returnsy:	returnStatement();	break;
@@ -511,7 +509,6 @@ void Parser::statement() {
 					SymSet fsys = statementBsys;
 					fsys.insert({ Symbol::semicolon, Symbol::rbrace });
 					call(fsys, tmp);
-					codeGen.emit1(Operator::call, tmp);
 					testSemicolon();
 				}
 			}
@@ -532,7 +529,15 @@ void Parser::statement() {
 				if (current_token.getSymbol() == Symbol::becomes) {
 					//////////////////////////////////////////////////////////////
 					SymbolItem * assignRet = assignStatement();
-					codeGen.emit3(Operator::assignOp, assignRet, arrIndex, tmp);
+					if (assignRet->typ > tmp->typ) {
+						error_handler.reportErrorMsg(current_token, 43);
+					}
+					if (tmp->obj == ObjectiveType::arrayty) {
+						codeGen.emit(Operator::arrSt, assignRet, arrIndex, tmp);
+					}
+					else {
+						codeGen.emit(Operator::assignOp, tmp, assignRet, NULL);
+					}
 				}
 				else {
 #ifdef DEBUG_Gramma_analysis
@@ -590,7 +595,7 @@ void Parser::returnStatement() {
 	fsys.insert(expBsys.begin(), expBsys.end());
 	nextSym();
 	if (hasRet) {	// function with return 
-		test({ lparent }, {}, 19);
+		test({ lparent }, fsys, 19);
 		if (current_token.getSymbol() == Symbol::lparent) {
 			nextSym();
 		}
@@ -604,13 +609,16 @@ void Parser::returnStatement() {
 				nextSym();
 				testSemicolon();
 			}
-			codeGen.emit2(Operator::returnOp, symTab.getFunItem(), r);
+			codeGen.emit(Operator::returnOp, symTab.getFunItem(), r, NULL);
 			returned = true;
 		}
 	}
 	else {		// function without return
 		testSemicolon();
-		codeGen.emit1(Operator::returnOp, symTab.getFunItem());
+		if (isMain) 
+			codeGen.emit(Operator::jmp, endMainLabel, NULL, NULL);
+		else 
+			codeGen.emit(Operator::returnOp, symTab.getFunItem(), NULL, NULL);
 		returned = true;
 	}
 }
@@ -645,7 +653,7 @@ void Parser::ifStatement(SymSet fsys) {
 	std::cout << lc << "行: ";
 	std::cout << "if 语句" << endl;
 #endif // DEBUG_Gramma_analysis
-	SymbolItem* endifLabel = codeGen.genLabel("end_if");
+	SymbolItem* endifLabel = codeGen.genLabel(labelType::end_if_lb);
 	fsys.insert(statementBsys.begin(), statementBsys.end());
 	fsys.insert({ Symbol::lbrace, Symbol::rbrace });
 	nextSym();
@@ -705,7 +713,7 @@ void Parser::switchStatement() {
 		if (current_token.getSymbol() == rparent) {
 			nextSym();
 		}
-		SymbolItem* end_switch = codeGen.genLabel("end_switch");
+		SymbolItem* end_switch = codeGen.genLabel(labelType::end_switch_lb);
 		test({ lbrace }, fsys, 5);
 		if (current_token.getSymbol() == lbrace) {
 			nextSym();
@@ -741,7 +749,7 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 	nextSym();
 	// read a const value
 	SymbolItem* constValue = NULL;
-	SymbolItem* end_case = codeGen.genLabel("end_case");
+	SymbolItem* end_case = codeGen.genLabel(labelType::end_case_lb);
 
 	SymSet fsys = statementBsys;
 	fsys.insert({ Symbol::casesy, Symbol::colon, Symbol::rbrace });
@@ -772,7 +780,7 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 		// make sure constValue != NULL
 		constValue = new SymbolItem();
 	}
-	codeGen.emit3(Operator::jne, expItem, constValue, end_case);
+	codeGen.emit(Operator::eql, end_case, expItem, constValue);
 	// test colon
 	test({ Symbol::colon }, fsys, 38);
 	if (current_token.getSymbol() == Symbol::colon) {
@@ -785,8 +793,8 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 #endif // DEBUG_Gramma_analysis
 	}
 	statement();
-	codeGen.emit1(Operator::jmp, end_switch);
-	codeGen.emit1(Operator::setLabel, end_case);
+	codeGen.emit(Operator::jmp, end_switch, NULL, NULL);
+	codeGen.emit(Operator::setLabel, end_case, NULL, NULL);
 }
 
 void Parser::defaultStatement() {
@@ -820,8 +828,8 @@ void Parser::whileStatement() {
 	std::cout << "while 语句" << endl;
 #endif // DEBUG_Gramma_analysis
 	SymbolItem* tmpCondition = NULL;
-	SymbolItem* end_while = codeGen.genLabel("end_while");
-	SymbolItem* start_while = codeGen.genLabel("start_while");
+	SymbolItem* end_while = codeGen.genLabel(labelType::end_while_lb);
+	SymbolItem* start_while = codeGen.genLabel(labelType::while_lb);
 	
 	nextSym();
 	test({ Symbol::lparent }, {}, 0);
@@ -834,7 +842,7 @@ void Parser::whileStatement() {
 			nextSym();
 			statement();
 		}
-		codeGen.emit1(Operator::jmp, start_while);
+		codeGen.emit(Operator::jmp, start_while, NULL, NULL);
 		codeGen.setLabel(end_while);
 	}
 }
@@ -848,17 +856,18 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 	std::cout << lc << "行: ";
 	std::cout << "call 语句" << endl;
 #endif // DEBUG_Gramma_analysis
-	codeGen.emit1(Operator::mark, funItem);	// 标记当前pc，保存现场
 	SymbolItem* para = NULL;
 	list<Type> paraTyps = funItem->paraList;
-
 
 	test({ lparent }, fsys, 19);
 	if (current_token.getSymbol() == lparent) {
 		nextSym();
+		SymbolItem* paras = new SymbolItem();
+		paras->obj = ObjectiveType::paras;
 		auto typ = paraTyps.begin();
 		while (typ != paraTyps.end()) {
 			// 参数写入数据栈
+			// record the paras in this while 
 			Token error_token = current_token;
 			para = expression(fsys);
 			if (*typ == Type::chartp && para->typ == Type::inttp) {
@@ -868,7 +877,9 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 				para->typ = Type::inttp;
 			}
 			if (para->typ != Type::notp) {
-				codeGen.emit1(Operator::stPara, para);
+				// use a SymbolItem* record parameters, store them together in the end
+				paras->paras.push_back(para);
+				// codeGen.emit(Operator::stPara, NULL, para, NULL);
 			}
 			if (current_token.getSymbol() == Symbol::comma) {
 				nextSym();
@@ -885,15 +896,21 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 			fsys.insert({ Symbol::rparent });
 			skip(fsys);
 		}
+		// 保存现场
+		codeGen.emit(Operator::save, NULL, symTab.getFunItem(), funItem);
+		// store the paras into the stack
+		codeGen.emit(Operator::stPara, NULL, paras, NULL);
 		test({ Symbol::rparent }, fsys, 20);
 		if (current_token.getSymbol() == rparent) {
 			nextSym();
 		}
 	}
-	codeGen.emit1(Operator::call, funItem->fun_label);
+	codeGen.emit(Operator::call, funItem, NULL, NULL);
 	if (funItem->hasRet) {
 		SymbolItem* returnValue = codeGen.genTemp();
-		codeGen.emit1(Operator::stRetVal, returnValue);
+		codeGen.emit(Operator::stRetVal, returnValue, NULL, NULL);
+		// no need to restore, just load when use that var
+		codeGen.emit(Operator::restore, NULL, symTab.getFunItem(), NULL);
 		return returnValue;
 	}
 	else {
@@ -918,7 +935,7 @@ void Parser::read() {
 			test({ Symbol::ident }, fsys, 7);
 			if (current_token.getSymbol() == Symbol::ident) {
 				SymbolItem* tmpItem = symTab.search(current_token);
-				codeGen.emit1(Operator::read, tmpItem);
+				codeGen.emit(Operator::read, tmpItem, NULL, NULL);
 				nextSym();
 			}
 			if (current_token.getSymbol() == Symbol::rparent) {
@@ -951,15 +968,17 @@ void Parser::write() {
 
 	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
+		SymbolItem* expItem = NULL;
+		SymbolItem* strItem = NULL;
 		str = current_token;
 		if (current_token.getSymbol() == stringcon) {
 			// stab
 			wHasStr = true;
 			nextSym();
-			SymbolItem* r = codeGen.genTemp();
-			r->typ = Type::stringtp;
-			r->ident_name = str.getString();
-			codeGen.emit1(Operator::print, r);
+			strItem = new SymbolItem();
+			strItem->obj = ObjectiveType::constty;
+			strItem->typ = Type::stringtp;
+			strItem->ident_name = str.getString();
 		}
 		com = current_token;
 		if (current_token.getSymbol() == Symbol::comma) {
@@ -969,10 +988,43 @@ void Parser::write() {
 		exp = current_token;
 		if (expBsys.count(current_token.getSymbol())) {
 			wHasExp = true;
-			SymbolItem* r = expression(fsys);
-			codeGen.emit1(Operator::print, r);
+			expItem = expression(fsys);
 		}
-		codeGen.emit0(Operator::print);
+		codeGen.emit(Operator::print, NULL, strItem, expItem);
+		/*
+		if (wHasStr) {
+			// if string exists, then add '\n' if exp doesnot exist or exp is const
+			if (!wHasExp) {
+				SymbolItem *r = new SymbolItem();
+				r->ident_name.push_back('\n');
+			}
+			else if (expItem->obj == ObjectiveType::constty) {
+				if (expItem->typ == Type::chartp)
+					r->ident_name.push_back((char)expItem->addr);
+				else if (expItem->typ == Type::inttp)
+					r->ident_name += int2str(expItem->addr);
+				r->ident_name.push_back('\n');
+			}
+			codeGen.emit(Operator::print, NULL, r, NULL);
+		}
+		else if (wHasExp) {
+			// if exp exist, check if it is const 
+			if (expItem->obj == ObjectiveType::constty) {
+				SymbolItem* r = new SymbolItem();
+				if (expItem->typ == Type::chartp)
+					r->ident_name.push_back((char)expItem->addr);
+				else if (expItem->typ == Type::inttp)
+					r->ident_name += int2str(expItem->addr);
+				r->ident_name.push_back('\n');
+				r->typ = Type::stringtp;
+				r->obj = ObjectiveType::constty;
+				codeGen.emit(Operator::print, NULL, r, NULL);
+			}
+			else {
+			}
+		}
+		*/
+		// error report
 		if (wHasComma) {
 			if (!wHasStr) {
 				error_handler.reportErrorMsg(str, 31);
@@ -1030,10 +1082,10 @@ void Parser::condition(SymbolItem* label) {
 			error_handler.reportErrorMsg(current_token, 30);
 		}
 		Operator op = codeGen.symbol2Operator(sy);
-		codeGen.emit3(op, exp1, exp2, label);
+		codeGen.emit(op, label, exp1, exp2);
 	}
 	else {
-		codeGen.emit2(Operator::jez, exp1, label);
+		codeGen.emit(Operator::jez, label, exp1, NULL);
 	}
 }
 
@@ -1044,6 +1096,7 @@ SymbolItem* Parser::expression(SymSet fsys) {
 	std::cout << "expression 语句" << endl;
 #endif // DEBUG_Gramma_analysis
 	// need an item record result of an expression
+	bool firstItem = true;
 	SymbolItem* item1 = NULL;
 	SymbolItem* item2 = NULL;
 	SymbolItem* r = NULL;
@@ -1056,17 +1109,33 @@ SymbolItem* Parser::expression(SymSet fsys) {
 		}
 		item1 = item(itemFsys);
 		if (sy == Symbol::minus) {
-			r = codeGen.genTemp();
-			codeGen.emit2(Operator::neg, item1, r);
-			item1 = r;
-			r = NULL;
+			if (item1->obj == ObjectiveType::constty) {
+				item1 = codeGen.genCon(item1->typ, -item1->addr);
+			}
+			else {
+				r = codeGen.genTemp();
+				codeGen.emit(Operator::neg, r, item1, NULL);
+				item1 = r;
+				r = NULL;
+			}
 		}
 		sy = current_token.getSymbol();
 		while (sy == Symbol::plus || sy == Symbol::minus) {
 			nextSym();
 			item2 = item(itemFsys);
+			if (item1->obj == ObjectiveType::constty && item2->obj == ObjectiveType::constty) {
+				if (firstItem) {
+					firstItem = false;
+					item1 = codeGen.genCon(item1->typ, item1->addr);
+				}
+				item1->addr = sy == Symbol::plus ? item1->addr + item2->addr : item1->addr - item2->addr;
+				item1->ident_name = int2str(item1->addr);
+				item1->typ = Type::inttp;
+				sy = current_token.getSymbol();
+				continue;
+			}
 			r = codeGen.genTemp();
-			codeGen.emit3(codeGen.symbol2Operator(sy), item1, item2, r);
+			codeGen.emit(codeGen.symbol2Operator(sy), r, item1, item2);
 			item1 = r;
 			item2 = r = NULL;
 			sy = current_token.getSymbol();
@@ -1085,6 +1154,7 @@ SymbolItem* Parser::item(SymSet fsys) {
 	std::cout << lc << "行: ";
 	std::cout << "item 语句" << endl;
 #endif // DEBUG_Gramma_analysis
+	bool firstItem = true;
 	SymbolItem* r = NULL;
 	SymbolItem* factor1 = NULL;
 	SymbolItem* factor2 = NULL;
@@ -1096,8 +1166,19 @@ SymbolItem* Parser::item(SymSet fsys) {
 		while (sy == Symbol::times || sy == Symbol::slash) {
 			nextSym();
 			factor2 = factor(fsys);
+			if (factor1->obj == ObjectiveType::constty && factor2->obj == ObjectiveType::constty) {
+				if (firstItem) {
+					firstItem = false;
+					factor1 = codeGen.genCon(factor1->typ, factor1->addr);
+				}
+				factor1->addr = sy ==  Symbol::times ? factor1->addr * factor2->addr : factor1->addr / factor2->addr; 
+				factor1->ident_name = int2str(factor1->addr);
+				factor1->typ = Type::inttp;
+				sy = current_token.getSymbol();
+				continue;
+			}
 			r = codeGen.genTemp();
-			codeGen.emit3(codeGen.symbol2Operator(sy), factor1, factor2, r);
+			codeGen.emit(codeGen.symbol2Operator(sy), r, factor1, factor2);
 			factor1 = r;
 			factor2 = r = NULL;
 			sy = current_token.getSymbol();
@@ -1130,7 +1211,7 @@ SymbolItem* Parser::factor(SymSet fsys) {
 				case ObjectiveType::arrayty: {
 					SymbolItem* offset = selector(fsys);
 					SymbolItem* r = codeGen.genTemp();
-					codeGen.emit3(Operator::assignOp, r, offset, tmpItem);
+					codeGen.emit(Operator::arrLd, r, offset, tmpItem);
 					return r;
 					break;
 				}
@@ -1165,7 +1246,6 @@ SymbolItem* Parser::factor(SymSet fsys) {
 		case Symbol::minus:
 		case Symbol::intcon: {
 			// do something
-			SymSet fsys = {};
 			int tmp = this->signedInt(fsys);
 			SymbolItem* r = codeGen.genCon(Type::inttp, tmp);
 			return r;

@@ -44,6 +44,7 @@ void SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize) {
 	item->ident_name = name;
 	item->typ = typ;
 	item->level = this->level;
+	item->arrayNumMax = arraySize;
 	// compute variable size
 	int tmpSize = typeSize(typ);
 	if (arraySize == 0) {
@@ -51,14 +52,16 @@ void SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize) {
 	}
 	else {
 		item->obj = ObjectiveType::arrayty;
-		tmpSize += tmpSize * arraySize;
+		tmpSize = tmpSize * arraySize;
 	}
 // check which table to insert
 	if (level == 0) {
 		if (symTab.count(name)) 
 			error_handler.reportErrorMsg(name_token, 9);
-		else 
+		else {
 			symTab[name] = item;
+			item->varSize = tmpSize;
+		}
 	}
 	else {
 		if (ftab->count(name)) 
@@ -66,14 +69,13 @@ void SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize) {
 		else {
 			(*ftab)[name] = item;
 			item->addr = stack;
-			lastFunItem->totalSize += tmpSize;
 			stack += tmpSize;
 		}
 	}
+	align();
 }
 
 void SymbolTable::enterTemp(SymbolItem* tmp) {
-	// ????????????????????????????????????
 	if (level == 0) {
 #ifdef DEBUG
 		cout << "fatal: SymbolTable::enterTemp(): level != 1" << endl;
@@ -81,10 +83,10 @@ void SymbolTable::enterTemp(SymbolItem* tmp) {
 	}
 	(*ftab)[tmp->ident_name] = tmp;
 	lastFunItem->tmpSize += INTSIZE;
-	lastFunItem->totalSize += INTSIZE;
 	tmp->level = 1;
 	tmp->addr = stack;
 	stack += INTSIZE;
+	align();
 }
 
 void SymbolTable::enterPara(Token name_token, enum Type typ) {
@@ -145,9 +147,11 @@ void SymbolTable::funDone() {
 	lastFunItem->link = NULL;
 	delete ftab;
 	*/
+	lastFunItem->totalSize = stack;
 	ftab = NULL;
 	lastFunItem = NULL;
+	
 	level = 0;
-	stack = 8;
+	stack = 4;
 }
 

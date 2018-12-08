@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "mipsObjCode.h"
 
 using namespace std;
 
@@ -28,7 +27,8 @@ enum class MipsCode {
 	sub,
 	subi,
 	//mult
-	mult,
+	mul,
+	sll,
 	//dive
 	ddiv,
 	//assign
@@ -45,6 +45,7 @@ enum class MipsCode {
 	mflo,
 	note
 };
+
 class Instruction {
 private:
 	string op = "";
@@ -52,18 +53,79 @@ private:
 	string src1 = "";
 	string src2 = "";
 public:
-	Instruction();
-	/*
-	Instruction(MipsCode _op);
-	Instruction(MipsCode _op, string _des);
-	Instruction(MipsCode _op, string _des, string _src1);
-	Instruction(MipsCode _op, string _des, string _src1, string _src2);
+	Instruction(MipsCode _op) {
+		op = getOpName(_op);
+	}
 
-	*/
-	string getOpName(MipsCode _opcode);
+	Instruction(MipsCode _op, string _des) {
+		op = getOpName(_op);
+		des = _des;
+	}
+
+	Instruction(MipsCode _op, string _des, string _src1) {
+		op = getOpName(_op);
+		des = _des;
+		src1 = _src1;
+	}
+
+	Instruction(MipsCode _op, string _des, string _src1, string _src2) {
+		op = getOpName(_op);
+		des = _des;
+		src1 = _src1;
+		src2 = _src2;
+	}
+
+	string getOpName(MipsCode _opcode) {
+	switch (_opcode) 
+		{
+		case MipsCode::lw:	return "lw";
+		case MipsCode::lb:	return "lb"; 
+		case MipsCode::sw:	return "sw"; 
+		case MipsCode::sb:	return "sb"; 
+		case MipsCode::li:	return "li"; 
+		case MipsCode::la:	return "la"; 
+		case MipsCode::jal:	return "jal"; 
+		case MipsCode::jr:	return "jr"; 
+		
+		case MipsCode::add:	return "add"; 
+		case MipsCode::addi:	return "addi"; 
+		case MipsCode::sub:		return "sub"; 
+		case MipsCode::subi:	return "subi"; 
+		case MipsCode::mul:		return "mul"; 
+		case MipsCode::ddiv:	return "div"; 
+		case MipsCode::sll:		return "sll"; 
+
+		case MipsCode::move:	return "move"; 
+		case MipsCode::mflo:	return "mflo"; 
+
+		case MipsCode::bgez:	return "bgez"; 
+		case MipsCode::blez:	return "blez"; 
+		case MipsCode::bgtz:	return "bgtz"; 
+		case MipsCode::bltz:	return "bltz"; 
+		case MipsCode::beqz:	return "beqz"; 
+		case MipsCode::bnez:	return "bnez"; 
+		case MipsCode::beq:		return "beq"; 
+		case MipsCode::bne:		return "bne"; 
+		case MipsCode::ble:		return "ble"; 
+		case MipsCode::blt:		return "blt"; 
+		case MipsCode::bge:		return "bge"; 
+		case MipsCode::bgt:		return "bgt"; 
+		
+		case MipsCode::syscall:	return "syscall"; 
+		case MipsCode::label:	return ""; 
+		case MipsCode::j:		return "j"; 
+		case MipsCode::note:	return "#"; 
+		default:	return "#error op";
+		}
+	}
 
 	string printInstr() {
-		return op + des + src1 + src2;
+		string r = "";
+		if (op != "") {
+			r = "\t";
+		}
+		r = r + op + des + src1 + src2;
+		return r;
 	}
 
 	~Instruction();

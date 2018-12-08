@@ -8,14 +8,16 @@ enum class Operator {
 	notOp,
 	assignOp,
 	minus, plus, times, slash, neg,
+
 	gtr, geq, les, leq, eql, neq,	// if condition is true then jump to label
-	jmp, jne, jez, 
+	jmp, jez, 
 	setLabel,
-						// jmp: no condition
-						// jeq: jump if condition is false;
-	call, returnOp, mark, stRa,
-	stPara, stRetVal, 
-	load, store,		// 
+	
+	save, stPara, call, 
+	st$ra, returnOp, 
+	stRetVal, restore,
+
+	arrLd, arrSt,		// 
 	read, print,
 };
 
@@ -26,18 +28,6 @@ struct Quadruples {
 	SymbolItem * src2 = NULL;
 	SymbolItem * dst  = NULL;
 };
-
-/*
-struct SymbolItem {
-	std::string ident_name = "";	// global ident
-	enum ObjectiveType obj = noty;	// var, const, tmp, fuction, array
-	enum Type typ = notp;			// vaule type
-	......
-	int addr = 0;	// varibale: offset from base of this block
-					// constant: char ascii or sigend integer
-};
-*/
-
 
 class MidCodeGen {
 	vector<Quadruples> midCodes;
@@ -56,24 +46,31 @@ public:
 
 	SymbolItem* genCon(Type typ, int value);
 
-	SymbolItem* genLabel(string s);
+	SymbolItem* genLabel(labelType l);
 	// genLabel: 1.
 
 	void setLabel(SymbolItem* label);
 
-	void emit3(Operator op, SymbolItem* src1, SymbolItem* src2, SymbolItem* dst);
+	void emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem* src2);
 	// compute, 
 	
-	void emit0(Operator op);
-
-	void emit1(Operator op, SymbolItem*);
-	// call, 
-
-	void emit2(Operator op, SymbolItem* src1, SymbolItem* dst);
-	// assign, 
-
 	void print();
 	string op2Str(Operator op);
+	string label2str(labelType l) {
+		switch (l) {
+		case labelType::main_lb:		return "main_lb";
+		case labelType::end_main_lb:	return "end_main_lb";
+		case labelType::fun_lb:			return "fun_lb";
+		case labelType::end_fun_lb:		return "end_fun_lb";
+		case labelType::while_lb:		return "while_lb";
+		case labelType::end_while_lb:	return "end_while_lb";
+		case labelType::end_if_lb:		return "end_if_lb";
+		case labelType::end_case_lb:	return "end_case_lb";
+		case labelType::end_switch_lb:	return "end_switch_lb";
+		default:						return "foo_label";
+		}
+	}
+
 
 	vector<Quadruples>& getMidCodes() {
 		return midCodes;

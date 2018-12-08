@@ -96,6 +96,8 @@ Token Lexer::getSym() {
 			if (ch < 32 || ch > 126) {
 				invalid_string_char = true;
 			}
+			if (ch == '\\')
+				ident_name.push_back(ch);	// 取消转义
 			ident_name.push_back(ch);	// 可以用ident_name记录字符串
 			getch();
 		}

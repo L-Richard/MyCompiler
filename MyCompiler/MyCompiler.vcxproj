@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="c0_enum.h" />
     <ClInclude Include="Const.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Instruction.h" />
@@ -179,9 +180,6 @@
     </ClCompile>
     <ClCompile Include="SymbolTable.cpp" />
     <ClCompile Include="Token.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="MyCompiler.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
