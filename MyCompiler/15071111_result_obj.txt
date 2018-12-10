@@ -1,2030 +1,820 @@
 .data
 	.align 2
-	_data__: .space 4
+	_data_g_array_char: .space 3
 	.align 2
-	_data___: .space 4
+	_data_g_array_int: .space 40
 	.align 2
-	_data____: .space 4
+	_data_g_var_char1: .space 1
 	.align 2
-	_data___a__: .space 4
+	_data_g_var_char2: .space 1
 	.align 2
-	_data__a_: .space 4
+	_data_g_var_int1: .space 4
 	.align 2
-	_data_count: .space 4
-	.align 2
-	_data_judge: .space 4
-	.align 2
-	_data_letter: .space 20
-	.align 2
-	_data_num: .space 40
-	.align 2
-	_data_s: .space 1
+	_data_g_var_int2: .space 4
 	_str_endl: .asciiz "\n"
-	_str_0: .asciiz " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\n"
-	_str_1: .asciiz "all test:"
+	_str_0: .asciiz "test_printf 1:\n"
+	_str_1: .asciiz "test_printf 2:a\n"
+	_str_2: .asciiz "test_printf 3:3\n"
+	_str_3: .asciiz "l\n"
+	_str_4: .asciiz "2\n"
+	_str_5: .asciiz "-------------------------------------------------------\n"
+	_str_6: .asciiz "test_fun: four parameters: int i,j   char c,d\n"
+	_str_7: .asciiz "test_fun: i="
+	_str_8: .asciiz "test_fun: j="
+	_str_9: .asciiz "test_fun: k="
+	_str_10: .asciiz "test_fun: c="
+	_str_11: .asciiz "test_fun: d="
+	_str_12: .asciiz "------------------------------------------------------\n"
+	_str_13: .asciiz "test_if: i=0, c='a'\n"
+	_str_14: .asciiz "test_if: <  : i<1\n"
+	_str_15: .asciiz "test_if: <= : i<=0\n"
+	_str_16: .asciiz "test_if: == : i==0\n"
+	_str_17: .asciiz "test_if: >  : i>-1\n"
+	_str_18: .asciiz "test_if: >= : i>=0\n"
+	_str_19: .asciiz "test_if: if(var char)\n"
+	_str_20: .asciiz "test_if: if(var int)\n"
+	_str_21: .asciiz "test_if: if(const char)\n"
+	_str_22: .asciiz "test_if: if(const int !0)\n"
+	_str_23: .asciiz "test_if: if(const int !0\n"
+	_str_24: .asciiz "test_if: if(const int 0\n"
+	_str_25: .asciiz "test_while: "
+	_str_26: .asciiz "test_switch(i): i = 0\n"
+	_str_27: .asciiz "test_switch(i): i = 1\n"
+	_str_28: .asciiz "test_switch(i): i = 'a'\n"
+	_str_29: .asciiz "test_switch(i): i = +2\n"
+	_str_30: .asciiz "test_switch(i): i = -3\n"
+	_str_31: .asciiz "test_switch(i): default\n"
+	_str_32: .asciiz "test assign statement:---------------\n"
+	_str_33: .asciiz "g_array_char[0] = "
+	_str_34: .asciiz "g_array_char[1] = "
+	_str_35: .asciiz "g_array_char[2] = "
+	_str_36: .asciiz "g_var_int1 = "
+	_str_37: .asciiz "g_var_int2 = "
+	_str_38: .asciiz "g_var_char1 = "
+	_str_39: .asciiz "g_var_char2 = "
+	_str_40: .asciiz "test global and local same name ident:\n"
+	_str_41: .asciiz "sameName in main: "
+	_str_42: .asciiz "test scanf: input n:\n"
+	_str_43: .asciiz "Fibnaci result of n "
+	_str_44: .asciiz "test expression statement:------------\n"
+	_str_45: .asciiz "complex expression: f = "
+	_str_46: .asciiz "set global array of int values:\n"
+	_str_47: .asciiz "print global array of int values:\n"
+	_str_48: .asciiz "g_array_int[i] = "
 .text
 	j main_lb0
  fun_lb2:
 	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, _data_count
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 16($sp)
-	lw $t0, 16($sp)
-	sw $t0, _data_count
-	li $t0, 0
-	sw $t0, 8($sp)
-	lw $t0, 4($sp)
-	li $t1, 1
-	beq $t0, $t1, end_if_lb3
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	sub $t0, $t0, $t1
-	sw $t0, 20($sp)
-	move $fp, $sp
-	subi $sp, $sp, 36
-	lw $t0, 20($fp)
-	sw $t0, 4($sp)
-	# call
-	jal fun_lb2
-	sw $v0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, 8($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, _data_judge
- end_if_lb3:
-	# calc
-	lw $t0, 8($sp)
-	lw $t1, 4($sp)
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $v0, 32($sp)
-	lw $ra, 0($sp)
-	addi $sp, $sp, 36
-	jr $ra
- fun_lb4:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	sw $t0, _data_judge
-	move $fp, $sp
-	subi $sp, $sp, 36
-	li $t0, 10
-	sw $t0, 4($sp)
-	# call
-	jal fun_lb2
-	sw $v0, 8($sp)
-	lw $v0, 8($sp)
+	li $v0, 97
 	lw $ra, 0($sp)
 	addi $sp, $sp, 12
 	jr $ra
- fun_lb5:
+ fun_lb3:
 	sw $ra, 0($sp)
-	li $v0, 65
+	li $v0, 195
 	lw $ra, 0($sp)
-	addi $sp, $sp, 8
+	addi $sp, $sp, 4
 	jr $ra
- fun_lb6:
+ fun_lb4:
 	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	sw $t0, _data_judge
 	# print
 	li $v0, 4
 	la $a0, _str_0
 	syscall
-	li $v0, 97
-	lw $ra, 0($sp)
-	addi $sp, $sp, 8
-	jr $ra
- fun_lb7:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
-	li $t0, 0
-	sw $t0, 4($sp)
-	li $t0, 0
-	sw $t0, 8($sp)
-	li $t0, 2
-	sw $t0, _data_count
-	li $t0, 97
-	sw $t0, _data_letter+0
-	li $t0, 49
-	sw $t0, _data_letter+4
-	li $t0, 95
-	sw $t0, _data_letter+8
-	li $t0, 43
-	sw $t0, _data_letter+12
-	li $t0, 65
-	sw $t0, _data_letter+16
 	# print
-	li $v0, 1
-	lw $a0, _data_count
-	syscall
 	li $v0, 4
-	la $a0, _str_endl
+	la $a0, _str_1
 	syscall
-	lw $t0, 16($sp)
-	lw $t0, _data_letter+0
-	sw $t0, 16($sp)
 	# print
-	li $v0, 1
-	lw $a0, 16($sp)
-	syscall
 	li $v0, 4
-	la $a0, _str_endl
+	la $a0, _str_2
 	syscall
-	lw $t0, _data_count
-	li $t1, 2
-	bne $t0, $t1, end_if_lb8
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 20($sp)
-	lw $t0, 20($sp)
-	sw $t0, _data_judge
- end_if_lb8:
-	lw $t0, _data_count
-	li $t1, 1
-	bne $t0, $t1, end_if_lb9
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb9:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb10
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, _data_judge
- end_if_lb10:
-	li $t0, 1
-	sw $t0, _data__
-	li $t0, 2
-	sw $t0, _data___
-	li $t0, 3
-	sw $t0, _data____
-	li $t0, 4
-	sw $t0, _data___a__
-	li $t0, 5
-	sw $t0, _data__a_
-	li $t0, 0
-	sw $t0, 8($sp)
-	lw $t0, _data__
-	li $t1, 1
-	bne $t0, $t1, end_if_lb11
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, _data_judge
- end_if_lb11:
-	lw $t0, _data__
-	li $t1, 0
-	bne $t0, $t1, end_if_lb12
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb12:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb13
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, _data_judge
- end_if_lb13:
-	li $t0, 0
-	sw $t0, 8($sp)
-	lw $t0, _data___
-	li $t1, 2
-	bne $t0, $t1, end_if_lb14
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, _data_judge
- end_if_lb14:
-	lw $t0, _data___
-	li $t1, 0
-	bne $t0, $t1, end_if_lb15
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb15:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb16
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	sw $t0, _data_judge
- end_if_lb16:
-	li $t0, 0
-	sw $t0, 8($sp)
-	lw $t0, _data____
-	li $t1, 3
-	bne $t0, $t1, end_if_lb17
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 52($sp)
-	lw $t0, 52($sp)
-	sw $t0, _data_judge
- end_if_lb17:
-	lw $t0, _data____
-	li $t1, 0
-	bne $t0, $t1, end_if_lb18
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb18:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb19
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 60($sp)
-	lw $t0, 60($sp)
-	sw $t0, _data_judge
- end_if_lb19:
-	li $t0, 0
-	sw $t0, 8($sp)
-	lw $t0, _data___a__
-	li $t1, 4
-	bne $t0, $t1, end_if_lb20
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 64($sp)
-	lw $t0, 64($sp)
-	sw $t0, _data_judge
- end_if_lb20:
-	lw $t0, _data___a__
-	li $t1, 0
-	bne $t0, $t1, end_if_lb21
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 68($sp)
-	lw $t0, 68($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb21:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb22
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 72($sp)
-	lw $t0, 72($sp)
-	sw $t0, _data_judge
- end_if_lb22:
-	li $t0, 0
-	sw $t0, 8($sp)
-	lw $t0, _data__a_
-	li $t1, 5
-	bne $t0, $t1, end_if_lb23
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 76($sp)
-	lw $t0, 76($sp)
-	sw $t0, _data_judge
- end_if_lb23:
-	lw $t0, _data__a_
-	li $t1, 0
-	bne $t0, $t1, end_if_lb24
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 80($sp)
-	lw $t0, 80($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb24:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb25
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 84($sp)
-	lw $t0, 84($sp)
-	sw $t0, _data_judge
- end_if_lb25:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 88
-	jr $ra
- fun_lb26:
-	sw $ra, 0($sp)
-	li $t0, 100
-	sw $t0, 20($sp)
-	lw $t0, 20($sp)
-	li $t1, 100
-	bne $t0, $t1, end_if_lb27
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, _data_judge
- end_if_lb27:
-	li $t0, 100
-	sw $t0, 12($sp)
-	li $t0, 101
-	sw $t0, 16($sp)
-	lw $t0, 28($sp)
-	lw $t0, 12($sp)
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	li $t1, 100
-	bne $t0, $t1, end_if_lb28
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, _data_judge
- end_if_lb28:
-	lw $t0, 36($sp)
-	lw $t0, 16($sp)
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	li $t1, 101
-	bne $t0, $t1, end_if_lb29
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, _data_judge
- end_if_lb29:
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb30
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	sw $t0, _data_judge
- end_if_lb30:
-	li $t0, 97
-	li $t1, 97
-	bne $t0, $t1, end_if_lb31
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 52($sp)
-	lw $t0, 52($sp)
-	sw $t0, _data_judge
- end_if_lb31:
-	li $t0, 95
-	li $t1, 95
-	bne $t0, $t1, end_if_lb32
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	sw $t0, _data_judge
- end_if_lb32:
-	li $t0, 97
-	sb $t0, 8($sp)
-	# calc
-	lb $t0, 8($sp)
-	li $t1, 97
-	add $t0, $t0, $t1
-	sw $t0, 60($sp)
-	lw $t0, 60($sp)
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 194
-	bne $t0, $t1, end_if_lb33
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 64($sp)
-	lw $t0, 64($sp)
-	sw $t0, _data_judge
- end_if_lb33:
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_case_lb35
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 68($sp)
-	lw $t0, 68($sp)
-	sw $t0, _data_judge
-	j end_switch_lb34
- end_case_lb35:
- end_switch_lb34:
-	li $t0, 1
-	li $t1, 0
-	bne $t0, $t1, end_case_lb37
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 72($sp)
-	lw $t0, 72($sp)
-	sw $t0, _data_judge
-	j end_switch_lb36
- end_case_lb37:
- end_switch_lb36:
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb39:
-	lw $t0, 4($sp)
-	li $t1, 2
-	bge $t0, $t1, end_while_lb38
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 76($sp)
-	lw $t0, 76($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 80($sp)
-	lw $t0, 80($sp)
-	sw $t0, 4($sp)
-	j while_lb39
- end_while_lb38:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 84
-	jr $ra
- fun_lb40:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	sw $t0, _data_judge
-	lw $ra, 0($sp)
-	addi $sp, $sp, 8
-	jr $ra
- fun_lb41:
-	sw $ra, 0($sp)
-	li $t0, 0
-	sw $t0, 4($sp)
-	li $t0, 1
-	sw $t0, 8($sp)
-	li $t0, 0
-	sw $t0, 12($sp)
-	lw $t0, 4($sp)
-	lw $t1, 8($sp)
-	bge $t0, $t1, end_if_lb42
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 16($sp)
-	lw $t0, 16($sp)
-	sw $t0, _data_judge
- end_if_lb42:
-	lw $t0, 8($sp)
-	lw $t1, 4($sp)
-	ble $t0, $t1, end_if_lb43
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 20($sp)
-	lw $t0, 20($sp)
-	sw $t0, _data_judge
- end_if_lb43:
-	lw $t0, 4($sp)
-	lw $t1, 8($sp)
-	bne $t0, $t1, end_if_lb44
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 12($sp)
- end_if_lb44:
-	lw $t0, 12($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb45
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, _data_judge
- end_if_lb45:
-	lw $t0, 4($sp)
-	lw $t1, 8($sp)
-	beq $t0, $t1, end_if_lb46
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, _data_judge
- end_if_lb46:
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb48:
-	lw $t0, 4($sp)
-	li $t1, 1
-	bgt $t0, $t1, end_while_lb47
-	lw $t0, 4($sp)
-	lw $t1, 8($sp)
-	bgt $t0, $t1, end_if_lb49
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, _data_judge
- end_if_lb49:
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, 4($sp)
-	j while_lb48
- end_while_lb47:
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb51:
-	lw $t0, 4($sp)
-	li $t1, 1
-	bgt $t0, $t1, end_while_lb50
-	lw $t0, 8($sp)
-	lw $t1, 4($sp)
-	blt $t0, $t1, end_if_lb52
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
- end_if_lb52:
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	sw $t0, 4($sp)
-	j while_lb51
- end_while_lb50:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 52
-	jr $ra
- fun_lb53:
-	sw $ra, 0($sp)
-	li $t0, 0
-	sw $t0, 4($sp)
-	li $t0, 0
-	sw $t0, 8($sp)
-	li $t0, 97
-	sb $t0, 12($sp)
-	li $t0, 98
-	sb $t0, 16($sp)
-	li $t0, 99
-	sb $t0, 20($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, _data_judge
-	lw $t0, 4($sp)
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb54
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, _data_judge
- end_if_lb54:
-	# calc
-	lw $t0, 4($sp)
-	sub $t0, $0, $t0
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb55
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
- end_if_lb55:
-	lb $t0, 12($sp)
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 97
-	bne $t0, $t1, end_if_lb56
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	sw $t0, _data_judge
- end_if_lb56:
-	# calc
-	lb $t0, 12($sp)
-	sub $t0, $0, $t0
-	sw $t0, 52($sp)
-	lw $t0, 52($sp)
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, -97
-	bne $t0, $t1, end_if_lb57
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	sw $t0, _data_judge
- end_if_lb57:
-	li $t0, 3
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 3
-	bne $t0, $t1, end_if_lb58
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 60($sp)
-	lw $t0, 60($sp)
-	sw $t0, _data_judge
- end_if_lb58:
-	li $t0, -1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, -1
-	bne $t0, $t1, end_if_lb59
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 64($sp)
-	lw $t0, 64($sp)
-	sw $t0, _data_judge
- end_if_lb59:
-	li $t0, 1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 1
-	bne $t0, $t1, end_if_lb60
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 68($sp)
-	lw $t0, 68($sp)
-	sw $t0, _data_judge
- end_if_lb60:
-	li $t0, 1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 1
-	bne $t0, $t1, end_if_lb61
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 72($sp)
-	lw $t0, 72($sp)
-	sw $t0, _data_judge
- end_if_lb61:
-	li $t0, -1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, -1
-	bne $t0, $t1, end_if_lb62
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 76($sp)
-	lw $t0, 76($sp)
-	sw $t0, _data_judge
- end_if_lb62:
-	li $t0, 1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 1
-	bne $t0, $t1, end_if_lb63
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 80($sp)
-	lw $t0, 80($sp)
-	sw $t0, _data_judge
- end_if_lb63:
-	li $t0, -9
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, -9
-	bne $t0, $t1, end_if_lb64
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 84($sp)
-	lw $t0, 84($sp)
-	sw $t0, _data_judge
- end_if_lb64:
-	li $t0, 5
-	sw $t0, 8($sp)
-	lw $t0, 88($sp)
-	lw $t1, 8($sp)
-	sll $t2, $t1, 2
-	lw $t0, _data_num($t2)
-	sw $t0, 88($sp)
-	# calc
-	lw $t0, 8($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 92($sp)
-	lw $t0, 96($sp)
-	lw $t1, 92($sp)
-	sll $t2, $t1, 2
-	lw $t0, _data_num($t2)
-	sw $t0, 96($sp)
-	# calc
-	lw $t0, 88($sp)
-	lw $t1, 96($sp)
-	add $t0, $t0, $t1
-	sw $t0, 100($sp)
-	# calc
-	lw $t0, 100($sp)
-	li $t1, 3
-	add $t0, $t0, $t1
-	sw $t0, 104($sp)
-	move $fp, $sp
-	subi $sp, $sp, 12
-	# call
-	jal fun_lb4
-	sw $v0, 108($sp)
-	# calc
-	lw $t0, 104($sp)
-	lw $t1, 108($sp)
-	mul $t0, $t0, $t1
-	sw $t0, 112($sp)
-	# calc
-	lw $t0, 112($sp)
-	li $t1, 3
-	div $t0, $t1
-	mflo $t0
-	sw $t0, 116($sp)
-	# calc
-	lw $t0, 116($sp)
-	sub $t0, $0, $t0
-	sw $t0, 120($sp)
-	# calc
-	lw $t0, 120($sp)
-	li $t1, 97
-	add $t0, $t0, $t1
-	sw $t0, 124($sp)
-	# calc
-	lw $t0, 124($sp)
-	li $t1, 97
-	add $t0, $t0, $t1
-	sw $t0, 128($sp)
-	# calc
-	lw $t0, 128($sp)
-	li $t1, 2
-	sub $t0, $t0, $t1
-	sw $t0, 132($sp)
-	lw $t0, 136($sp)
-	lw $t0, _data_letter+0
-	sw $t0, 136($sp)
-	# calc
-	lw $t0, 132($sp)
-	lw $t1, 136($sp)
-	add $t0, $t0, $t1
-	sw $t0, 140($sp)
-	lw $t0, 140($sp)
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 33
-	bne $t0, $t1, end_if_lb65
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 144($sp)
-	lw $t0, 144($sp)
-	sw $t0, _data_judge
- end_if_lb65:
-	li $t0, 1
-	sw $t0, 4($sp)
-	li $t0, 1
-	sw $t0, 8($sp)
-	li $t0, 97
-	sb $t0, 24($sp)
-	li $t0, 113
-	sb $t0, 28($sp)
-	# calc
-	lb $t0, 24($sp)
-	lb $t1, 28($sp)
-	mul $t0, $t0, $t1
-	sw $t0, 148($sp)
-	# calc
-	lb $t0, 20($sp)
-	lw $t1, 148($sp)
-	add $t0, $t0, $t1
-	sw $t0, 152($sp)
-	# calc
-	lb $t0, 16($sp)
-	lw $t1, 152($sp)
-	add $t0, $t0, $t1
-	sw $t0, 156($sp)
-	# calc
-	lb $t0, 12($sp)
-	lw $t1, 156($sp)
-	mul $t0, $t0, $t1
-	sw $t0, 160($sp)
-	# calc
-	lw $t0, 8($sp)
-	lw $t1, 160($sp)
-	add $t0, $t0, $t1
-	sw $t0, 164($sp)
-	# calc
-	lw $t0, 4($sp)
-	lw $t1, 164($sp)
-	mul $t0, $t0, $t1
-	sw $t0, 168($sp)
-	lw $t0, 168($sp)
-	sw $t0, 4($sp)
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1024
-	div $t0, $t1
-	mflo $t0
-	sw $t0, 172($sp)
-	# calc
-	lw $t0, _data_judge
-	lw $t1, 172($sp)
-	add $t0, $t0, $t1
-	sw $t0, 176($sp)
-	lw $t0, 176($sp)
-	sw $t0, _data_judge
-	lw $ra, 0($sp)
-	addi $sp, $sp, 180
-	jr $ra
- fun_lb66:
-	sw $ra, 0($sp)
-	li $t0, 9
-	sw $t0, 8($sp)
- while_lb68:
-	lw $t0, 8($sp)
-	li $t1, 0
-	blt $t0, $t1, end_while_lb67
-	lw $t0, 8($sp)
-	li $t1, 5
-	blt $t0, $t1, end_if_lb69
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
- end_if_lb69:
-	# calc
-	lw $t0, 8($sp)
-	li $t1, 1
-	sub $t0, $t0, $t1
-	sw $t0, 16($sp)
-	lw $t0, 16($sp)
-	sw $t0, 8($sp)
-	j while_lb68
- end_while_lb67:
-	li $t0, 0
-	sw $t0, 8($sp)
- while_lb71:
-	lw $t0, 8($sp)
-	li $t1, 2
-	bgt $t0, $t1, end_while_lb70
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_case_lb73
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 20($sp)
-	lw $t0, 20($sp)
-	sw $t0, _data_judge
-	j end_switch_lb72
- end_case_lb73:
-	lw $t0, 8($sp)
-	li $t1, 1
-	bne $t0, $t1, end_case_lb74
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, _data_judge
-	j end_switch_lb72
- end_case_lb74:
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, _data_judge
- end_switch_lb72:
-	# calc
-	lw $t0, 8($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, 8($sp)
-	j while_lb71
- end_while_lb70:
-	li $t0, 0
-	sw $t0, 8($sp)
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb76:
-	lw $t0, 4($sp)
-	li $t1, 2
-	bgt $t0, $t1, end_while_lb75
-	li $t0, 0
-	sw $t0, 8($sp)
- while_lb78:
-	lw $t0, 8($sp)
-	li $t1, 2
-	bgt $t0, $t1, end_while_lb77
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, 8($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, 8($sp)
-	j while_lb78
- end_while_lb77:
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, 4($sp)
-	j while_lb76
- end_while_lb75:
-	li $t0, 0
-	sw $t0, 8($sp)
-	li $t0, 11
-	sw $t0, 4($sp)
- while_lb80:
-	lw $t0, 8($sp)
-	li $t1, 10
-	bge $t0, $t1, end_while_lb79
-	# calc
-	lw $t0, 8($sp)
-	lw $t1, 4($sp)
-	mul $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	lw $t1, 8($sp)
-	sll $t2, $t1, 2
-	sw $t0, _data_num($t2)
-	lw $t0, 52($sp)
-	lw $t1, 8($sp)
-	sll $t2, $t1, 2
-	lw $t0, _data_num($t2)
-	sw $t0, 52($sp)
-	# calc
-	lw $t0, _data_judge
-	lw $t1, 52($sp)
-	add $t0, $t0, $t1
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, 8($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 60($sp)
-	lw $t0, 60($sp)
-	sw $t0, 8($sp)
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 2
-	add $t0, $t0, $t1
-	sw $t0, 64($sp)
-	lw $t0, 64($sp)
-	sw $t0, 4($sp)
-	j while_lb80
- end_while_lb79:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 68
-	jr $ra
- fun_lb81:
-	sw $ra, 0($sp)
-	li $t0, 0
-	sw $t0, 4($sp)
-	li $t0, 0
-	sw $t0, 8($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 16($sp)
-	lw $t0, 16($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb82
- end_if_lb82:
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb83
- end_if_lb83:
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb84
- end_if_lb84:
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb86:
-	lw $t0, 4($sp)
-	li $t1, 1
-	bgt $t0, $t1, end_while_lb85
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb87
-	lw $t0, 4($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb88
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 20($sp)
-	lw $t0, 20($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb88:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb89
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, _data_judge
- end_if_lb89:
- end_if_lb87:
-	li $t0, 0
-	sw $t0, 8($sp)
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, 4($sp)
-	j while_lb86
- end_while_lb85:
-	li $t0, 0
-	sw $t0, 4($sp)
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb90
- while_lb92:
-	lw $t0, 4($sp)
-	li $t1, 2
-	bge $t0, $t1, end_while_lb91
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, 4($sp)
-	j while_lb92
- end_while_lb91:
- end_if_lb90:
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb94:
-	lw $t0, 4($sp)
-	li $t1, 1
-	bgt $t0, $t1, end_while_lb93
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb95
-	lw $t0, 4($sp)
-	li $t1, 0
-	bne $t0, $t1, end_case_lb97
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, _data_judge
-	j end_switch_lb96
- end_case_lb97:
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
- end_switch_lb96:
- end_if_lb95:
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	sw $t0, 4($sp)
-	j while_lb94
- end_while_lb93:
-	li $t0, 0
-	sw $t0, 8($sp)
-	li $t0, 97
-	sb $t0, 12($sp)
-	lb $t0, 12($sp)
-	li $t1, 97
-	bne $t0, $t1, end_if_lb98
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 52($sp)
-	lw $t0, 52($sp)
-	sw $t0, _data_judge
- end_if_lb98:
-	lb $t0, 12($sp)
-	li $t1, 98
-	bne $t0, $t1, end_if_lb99
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 8($sp)
- end_if_lb99:
-	lw $t0, 8($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb100
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 60($sp)
-	lw $t0, 60($sp)
-	sw $t0, _data_judge
- end_if_lb100:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 64
-	jr $ra
- fun_lb101:
-	sw $ra, 0($sp)
-	li $t0, 0
-	sw $t0, 12($sp)
-	li $t0, 0
-	sw $t0, 16($sp)
-	li $t0, 0
-	sw $t0, 4($sp)
-	li $t0, 0
-	sw $t0, 8($sp)
- while_lb103:
-	lw $t0, 4($sp)
-	li $t1, 6
-	bgt $t0, $t1, end_while_lb102
-	lw $t0, 4($sp)
-	li $t1, 0
-	bne $t0, $t1, end_case_lb105
-	li $t0, 1
-	li $t1, 1
-	bne $t0, $t1, end_if_lb106
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
-	lw $t0, 24($sp)
-	sw $t0, _data_judge
-	li $t0, 3
-	sw $t0, _data_num+0
-	move $fp, $sp
-	subi $sp, $sp, 36
-	li $t0, 3
-	sw $t0, 4($sp)
-	# call
-	jal fun_lb2
-	sw $v0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, _data_num+12
- end_if_lb106:
-	li $t0, 1
-	li $t1, 0
-	bne $t0, $t1, end_if_lb107
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	lw $t0, 32($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 12($sp)
- end_if_lb107:
-	lw $t0, 12($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb108
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, _data_judge
- end_if_lb108:
-	li $t0, 1
-	sw $t0, 16($sp)
-	j end_switch_lb104
- end_case_lb105:
-	lw $t0, 4($sp)
-	li $t1, 1
-	bne $t0, $t1, end_case_lb109
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, _data_judge
-	li $t0, 0
-	sw $t0, 8($sp)
- while_lb111:
-	lw $t0, 8($sp)
-	li $t1, 2
-	bgt $t0, $t1, end_while_lb110
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, 8($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	lw $t0, 48($sp)
-	sw $t0, 8($sp)
-	j while_lb111
- end_while_lb110:
-	li $t0, 1
-	sw $t0, 16($sp)
-	j end_switch_lb104
- end_case_lb109:
-	lw $t0, 4($sp)
-	li $t1, 2
-	bne $t0, $t1, end_case_lb112
-	j end_switch_lb104
- end_case_lb112:
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 52($sp)
-	lw $t0, 52($sp)
-	sw $t0, _data_judge
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 3
-	div $t0, $t1
-	mflo $t0
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	li $t1, 1
-	bne $t0, $t1, end_case_lb114
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 60($sp)
-	lw $t0, 60($sp)
-	sw $t0, _data_judge
-	li $t0, 1
-	sw $t0, 16($sp)
-	j end_switch_lb113
- end_case_lb114:
- end_switch_lb113:
-	lw $t0, 16($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb115
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 64($sp)
-	lw $t0, 64($sp)
-	sw $t0, _data_judge
- end_if_lb115:
-	li $t0, 1
-	sw $t0, 16($sp)
- end_switch_lb104:
-	lw $t0, 16($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb116
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 68($sp)
-	lw $t0, 68($sp)
-	sw $t0, _data_judge
- end_if_lb116:
-	li $t0, 0
-	sw $t0, 16($sp)
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 72($sp)
-	lw $t0, 72($sp)
-	sw $t0, 4($sp)
-	j while_lb103
- end_while_lb102:
-	li $t0, 0
-	sw $t0, 4($sp)
- while_lb118:
-	lw $t0, 4($sp)
-	li $t1, 3
-	bge $t0, $t1, end_while_lb117
-	lw $t0, 4($sp)
-	li $t1, 0
-	bne $t0, $t1, end_if_lb119
-	li $t0, 97
-	sb $t0, 20($sp)
- end_if_lb119:
-	lw $t0, 4($sp)
-	li $t1, 1
-	bne $t0, $t1, end_if_lb120
-	li $t0, 98
-	sb $t0, 20($sp)
- end_if_lb120:
-	lw $t0, 4($sp)
-	li $t1, 2
-	bne $t0, $t1, end_if_lb121
-	li $t0, 99
-	sb $t0, 20($sp)
- end_if_lb121:
-	lb $t0, 20($sp)
-	li $t1, 97
-	bne $t0, $t1, end_case_lb123
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 76($sp)
-	lw $t0, 76($sp)
-	sw $t0, _data_judge
-	j end_switch_lb122
- end_case_lb123:
-	lb $t0, 20($sp)
-	li $t1, 98
-	bne $t0, $t1, end_case_lb124
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 80($sp)
-	lw $t0, 80($sp)
-	sw $t0, _data_judge
-	j end_switch_lb122
- end_case_lb124:
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 84($sp)
-	lw $t0, 84($sp)
-	sw $t0, _data_judge
- end_switch_lb122:
-	# calc
-	lw $t0, 4($sp)
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 88($sp)
-	lw $t0, 88($sp)
-	sw $t0, 4($sp)
-	j while_lb118
- end_while_lb117:
-	li $t0, 1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 1
-	bne $t0, $t1, end_case_lb126
-	j end_switch_lb125
- end_case_lb126:
- end_switch_lb125:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 92
-	jr $ra
- fun_lb127:
-	sw $ra, 0($sp)
-	li $t0, 11
-	sw $t0, 4($sp)
-	li $t0, 97
-	sb $t0, 8($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
-	move $fp, $sp
-	subi $sp, $sp, 8
-	lb $t0, 8($fp)
-	sw $t0, 4($sp)
-	# call
-	jal fun_lb5
-	sw $v0, 16($sp)
-	move $fp, $sp
-	subi $sp, $sp, 12
-	# call
-	jal fun_lb4
-	sw $v0, 20($sp)
-	# calc
-	lw $t0, 16($sp)
-	lw $t1, 20($sp)
-	add $t0, $t0, $t1
-	sw $t0, 24($sp)
 	# print
-	li $v0, 1
-	lw $a0, 24($sp)
-	syscall
 	li $v0, 4
-	la $a0, _str_endl
+	la $a0, _str_3
 	syscall
-	move $fp, $sp
-	subi $sp, $sp, 8
-	# call
-	jal fun_lb6
-	sw $v0, 28($sp)
-	lw $ra, 0($sp)
-	addi $sp, $sp, 32
-	jr $ra
- fun_lb128:
-	sw $ra, 0($sp)
-	li $t0, 1
-	sw $t0, 4($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 8($sp)
-	lw $t0, 8($sp)
-	sw $t0, _data_judge
 	# print
+	li $v0, 4
+	la $a0, _str_4
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_5
+	syscall
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	jr $ra
+ fun_lb5:
+	sw $ra, 0($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_6
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_7
+	syscall
 	li $v0, 1
 	lw $a0, 4($sp)
 	syscall
 	li $v0, 4
 	la $a0, _str_endl
 	syscall
-	li $t0, 5
+	# print
+	li $v0, 4
+	la $a0, _str_8
+	syscall
+	li $v0, 1
+	lw $a0, 8($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_9
+	syscall
+	li $v0, 1
+	lw $a0, 12($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_10
+	syscall
+	li $v0, 11
+	lb $a0, 16($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_11
+	syscall
+	li $v0, 11
+	lb $a0, 20($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_12
+	syscall
+	lw $ra, 0($sp)
+	addi $sp, $sp, 24
+	jr $ra
+ fun_lb6:
+	sw $ra, 0($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_13
+	syscall
+	li $t0, 0
+	li $t1, 1
+	bge $t0, $t1, end_if_lb7
+	# print
+	li $v0, 4
+	la $a0, _str_14
+	syscall
+ end_if_lb7:
+	li $t0, 0
+	li $t1, 0
+	bgt $t0, $t1, end_if_lb8
+	# print
+	li $v0, 4
+	la $a0, _str_15
+	syscall
+ end_if_lb8:
+	li $t0, 0
+	li $t1, 0
+	bne $t0, $t1, end_if_lb9
+	# print
+	li $v0, 4
+	la $a0, _str_16
+	syscall
+ end_if_lb9:
+	li $t0, 0
+	li $t1, -1
+	ble $t0, $t1, end_if_lb10
+	# print
+	li $v0, 4
+	la $a0, _str_17
+	syscall
+ end_if_lb10:
+	li $t0, 0
+	li $t1, 0
+	blt $t0, $t1, end_if_lb11
+	# print
+	li $v0, 4
+	la $a0, _str_18
+	syscall
+ end_if_lb11:
+	li $t0, 97
+	beqz $t0, end_if_lb12
+	# print
+	li $v0, 4
+	la $a0, _str_19
+	syscall
+ end_if_lb12:
+	li $t0, 0
+	beqz $t0, end_if_lb13
+	# print
+	li $v0, 4
+	la $a0, _str_20
+	syscall
+ end_if_lb13:
+	li $t0, 97
+	beqz $t0, end_if_lb14
+	# print
+	li $v0, 4
+	la $a0, _str_21
+	syscall
+ end_if_lb14:
+	li $t0, 1
+	beqz $t0, end_if_lb15
+	# print
+	li $v0, 4
+	la $a0, _str_22
+	syscall
+ end_if_lb15:
+	li $t0, -1
+	beqz $t0, end_if_lb16
+	# print
+	li $v0, 4
+	la $a0, _str_23
+	syscall
+ end_if_lb16:
+	li $t0, 0
+	beqz $t0, end_if_lb17
+	# print
+	li $v0, 4
+	la $a0, _str_24
+	syscall
+ end_if_lb17:
+	# print
+	li $v0, 4
+	la $a0, _str_5
+	syscall
+	li $t0, 0
+	beqz $t0, end_if_lb18
+ end_if_lb18:
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	jr $ra
+ fun_lb19:
+	sw $ra, 0($sp)
+	li $t0, 0
 	sw $t0, 4($sp)
-	lw $t0, 12($sp)
-	lw $t1, 4($sp)
-	sll $t2, $t1, 2
-	lw $t0, _data_num($t2)
-	sw $t0, 12($sp)
+ while_lb21:
+	lw $t0, 4($sp)
+	li $t1, 5
+	bge $t0, $t1, end_while_lb20
+	# print
+	li $v0, 4
+	la $a0, _str_25
+	syscall
+	li $v0, 1
+	lw $a0, 4($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
 	# calc
 	lw $t0, 4($sp)
 	li $t1, 1
 	add $t0, $t0, $t1
+	sw $t0, 8($sp)
+	lw $t0, 8($sp)
+	sw $t0, 4($sp)
+	j while_lb21
+ end_while_lb20:
+	# print
+	li $v0, 4
+	la $a0, _str_5
+	syscall
+	lw $ra, 0($sp)
+	addi $sp, $sp, 12
+	jr $ra
+ fun_lb22:
+	sw $ra, 0($sp)
+	lw $t0, 4($sp)
+	li $t1, 0
+	bne $t0, $t1, end_case_lb24
+	# print
+	li $v0, 4
+	la $a0, _str_26
+	syscall
+	j end_switch_lb23
+ end_case_lb24:
+	lw $t0, 4($sp)
+	li $t1, 1
+	bne $t0, $t1, end_case_lb25
+	# print
+	li $v0, 4
+	la $a0, _str_27
+	syscall
+	j end_switch_lb23
+ end_case_lb25:
+	lw $t0, 4($sp)
+	li $t1, 97
+	bne $t0, $t1, end_case_lb26
+	# print
+	li $v0, 4
+	la $a0, _str_28
+	syscall
+	j end_switch_lb23
+ end_case_lb26:
+	lw $t0, 4($sp)
+	li $t1, 2
+	bne $t0, $t1, end_case_lb27
+	# print
+	li $v0, 4
+	la $a0, _str_29
+	syscall
+	j end_switch_lb23
+ end_case_lb27:
+	lw $t0, 4($sp)
+	li $t1, -3
+	bne $t0, $t1, end_case_lb28
+	# print
+	li $v0, 4
+	la $a0, _str_30
+	syscall
+	j end_switch_lb23
+ end_case_lb28:
+	# print
+	li $v0, 4
+	la $a0, _str_31
+	syscall
+ end_switch_lb23:
+	# print
+	li $v0, 4
+	la $a0, _str_5
+	syscall
+	lw $ra, 0($sp)
+	addi $sp, $sp, 8
+	jr $ra
+ fun_lb29:
+	sw $ra, 0($sp)
+	lw $t0, 4($sp)
+	li $t1, 1
+	bne $t0, $t1, end_if_lb30
+	li $v0, 1
+	lw $ra, 0($sp)
+	addi $sp, $sp, 28
+	jr $ra
+ end_if_lb30:
+	lw $t0, 4($sp)
+	li $t1, 2
+	bne $t0, $t1, end_if_lb31
+	li $v0, 1
+	lw $ra, 0($sp)
+	addi $sp, $sp, 28
+	jr $ra
+ end_if_lb31:
+	# calc
+	lw $t0, 4($sp)
+	li $t1, 1
+	sub $t0, $t0, $t1
+	sw $t0, 8($sp)
+	move $fp, $sp
+	subi $sp, $sp, 28
+	lw $t0, 8($fp)
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 12($sp)
+	# calc
+	lw $t0, 4($sp)
+	li $t1, 2
+	sub $t0, $t0, $t1
 	sw $t0, 16($sp)
-	lw $t0, 20($sp)
-	lw $t1, 16($sp)
-	sll $t2, $t1, 2
-	lw $t0, _data_num($t2)
-	sw $t0, 20($sp)
+	move $fp, $sp
+	subi $sp, $sp, 28
+	lw $t0, 16($fp)
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 20($sp)
 	# calc
 	lw $t0, 12($sp)
 	lw $t1, 20($sp)
 	add $t0, $t0, $t1
 	sw $t0, 24($sp)
-	# calc
-	lw $t0, 24($sp)
-	li $t1, 3
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	move $fp, $sp
-	subi $sp, $sp, 12
-	# call
-	jal fun_lb4
-	sw $v0, 32($sp)
-	# calc
-	lw $t0, 28($sp)
-	lw $t1, 32($sp)
-	mul $t0, $t0, $t1
-	sw $t0, 36($sp)
-	# calc
-	lw $t0, 36($sp)
-	li $t1, 3
-	div $t0, $t1
-	mflo $t0
-	sw $t0, 40($sp)
-	# calc
-	lw $t0, 40($sp)
-	sub $t0, $0, $t0
-	sw $t0, 44($sp)
-	# calc
-	lw $t0, 44($sp)
-	li $t1, 97
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	# calc
-	lw $t0, 48($sp)
-	li $t1, 97
-	add $t0, $t0, $t1
-	sw $t0, 52($sp)
-	# calc
-	lw $t0, 52($sp)
-	li $t1, 2
-	sub $t0, $t0, $t1
-	sw $t0, 56($sp)
-	# print
-	li $v0, 1
-	lw $a0, 56($sp)
-	syscall
-	li $v0, 4
-	la $a0, _str_endl
-	syscall
+	lw $v0, 24($sp)
 	lw $ra, 0($sp)
-	addi $sp, $sp, 60
+	addi $sp, $sp, 28
 	jr $ra
- fun_lb129:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 28($sp)
-	lw $t0, 28($sp)
-	sw $t0, _data_judge
-	# read
-	li $v0, 5
-	syscall
-	sw $v0, 4($sp)
-	# read
-	li $v0, 12
-	syscall
-	sb $v0, 16($sp)
-	# calc
-	lw $t0, _data_judge
-	lw $t1, 4($sp)
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	# calc
-	lw $t0, 32($sp)
-	lb $t1, 16($sp)
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	lw $t0, 36($sp)
-	sw $t0, _data_judge
-	# read
-	li $v0, 12
-	syscall
-	sb $v0, 16($sp)
-	lb $t0, 16($sp)
-	sw $t0, _data_letter+12
-	# calc
-	lw $t0, _data_judge
-	lb $t1, 16($sp)
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	lw $t0, 40($sp)
-	sw $t0, _data_judge
-	# read
-	li $v0, 5
-	syscall
-	sw $v0, 4($sp)
-	# calc
-	lw $t0, _data_judge
-	lw $t1, 4($sp)
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	lw $t0, 44($sp)
-	sw $t0, _data_judge
-	lw $ra, 0($sp)
-	addi $sp, $sp, 48
-	jr $ra
- fun_lb130:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	sw $t0, _data_judge
-	lw $t0, _data__
-	li $t1, 1
-	bne $t0, $t1, end_if_lb131
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 8($sp)
-	lw $t0, 8($sp)
-	sw $t0, _data_judge
- end_if_lb131:
-	lw $ra, 0($sp)
-	addi $sp, $sp, 12
-	jr $ra
- fun_lb132:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 8($sp)
-	lw $t0, 8($sp)
-	sw $t0, _data_judge
-	li $t0, 100
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	li $t1, 100
-	bne $t0, $t1, end_if_lb133
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
- end_if_lb133:
-	move $fp, $sp
-	subi $sp, $sp, 12
-	# call
-	jal fun_lb130
-	lw $ra, 0($sp)
-	addi $sp, $sp, 16
-	jr $ra
- fun_lb134:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	lw $t1, 4($sp)
-	add $t0, $t0, $t1
-	sw $t0, 32($sp)
-	# calc
-	lw $t0, 32($sp)
-	lw $t1, 8($sp)
-	add $t0, $t0, $t1
-	sw $t0, 36($sp)
-	# calc
-	lw $t0, 36($sp)
-	lw $t1, 12($sp)
-	add $t0, $t0, $t1
-	sw $t0, 40($sp)
-	# calc
-	lw $t0, 40($sp)
-	lw $t1, 16($sp)
-	add $t0, $t0, $t1
-	sw $t0, 44($sp)
-	# calc
-	lw $t0, 44($sp)
-	lw $t1, 20($sp)
-	add $t0, $t0, $t1
-	sw $t0, 48($sp)
-	# calc
-	lw $t0, 48($sp)
-	lw $t1, 24($sp)
-	add $t0, $t0, $t1
-	sw $t0, 52($sp)
-	# calc
-	lw $t0, 52($sp)
-	lw $t1, 28($sp)
-	add $t0, $t0, $t1
-	sw $t0, 56($sp)
-	lw $t0, 56($sp)
-	sw $t0, _data_judge
-	lw $ra, 0($sp)
-	addi $sp, $sp, 60
-	jr $ra
- fun_lb135:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
-	li $v0, 1
-	lw $ra, 0($sp)
-	addi $sp, $sp, 16
-	jr $ra
- fun_lb136:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
-	li $v0, 97
-	lw $ra, 0($sp)
-	addi $sp, $sp, 16
-	jr $ra
- fun_lb137:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 12($sp)
-	lw $t0, 12($sp)
-	sw $t0, _data_judge
-	lw $ra, 0($sp)
-	addi $sp, $sp, 16
-	jr $ra
- fun_lb138:
-	sw $ra, 0($sp)
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 4($sp)
-	lw $t0, 4($sp)
-	sw $t0, _data_judge
-	move $fp, $sp
-	subi $sp, $sp, 16
-	li $t0, 1
-	sw $t0, 4($sp)
-	li $t0, 2
-	sw $t0, 8($sp)
-	# call
-	jal fun_lb135
-	sw $v0, 8($sp)
-	move $fp, $sp
-	subi $sp, $sp, 16
-	li $t0, 97
-	sw $t0, 4($sp)
-	li $t0, 98
-	sw $t0, 8($sp)
-	# call
-	jal fun_lb136
-	sw $v0, 12($sp)
-	move $fp, $sp
-	subi $sp, $sp, 16
-	li $t0, 97
-	sw $t0, 4($sp)
-	li $t0, 1
-	sw $t0, 8($sp)
-	# call
-	jal fun_lb137
-	move $fp, $sp
-	subi $sp, $sp, 60
+ main_lb0:
 	li $t0, 1
 	sw $t0, 4($sp)
 	li $t0, 2
 	sw $t0, 8($sp)
 	li $t0, 3
 	sw $t0, 12($sp)
-	li $t0, 4
+	li $t0, 97
+	sb $t0, _data_g_array_char+0
+	li $t0, 98
+	sb $t0, _data_g_array_char+1
+	move $fp, $sp
+	subi $sp, $sp, 12
+	# call
+	jal fun_lb2
+	sb $v0, 20($sp)
+	lb $t0, 20($sp)
+	sb $t0, _data_g_array_char+2
+	move $fp, $sp
+	subi $sp, $sp, 4
+	# call
+	jal fun_lb3
+	sw $v0, 24($sp)
+	lw $t0, 24($sp)
 	sw $t0, 16($sp)
-	li $t0, 5
-	sw $t0, 20($sp)
 	li $t0, 6
-	sw $t0, 24($sp)
-	li $t0, 7
-	sw $t0, 28($sp)
-	# call
-	jal fun_lb134
-	lw $ra, 0($sp)
-	addi $sp, $sp, 16
-	jr $ra
- main_lb0:
-	li $t0, 0
-	sw $t0, _data_judge
-	# calc
-	lw $t0, _data_judge
-	li $t1, 1
-	add $t0, $t0, $t1
-	sw $t0, 8($sp)
-	lw $t0, 8($sp)
-	sw $t0, _data_judge
-	li $t0, 0
-	sw $t0, 4($sp)
-	move $fp, $sp
-	subi $sp, $sp, 88
-	# call
-	jal fun_lb7
-	move $fp, $sp
-	subi $sp, $sp, 84
-	# call
-	jal fun_lb26
-	move $fp, $sp
-	subi $sp, $sp, 8
-	# call
-	jal fun_lb40
-	move $fp, $sp
-	subi $sp, $sp, 52
-	# call
-	jal fun_lb41
-	move $fp, $sp
-	subi $sp, $sp, 180
-	# call
-	jal fun_lb53
-	move $fp, $sp
-	subi $sp, $sp, 68
-	# call
-	jal fun_lb66
-	move $fp, $sp
-	subi $sp, $sp, 64
-	# call
-	jal fun_lb81
-	move $fp, $sp
-	subi $sp, $sp, 92
-	# call
-	jal fun_lb101
-	move $fp, $sp
-	subi $sp, $sp, 32
-	# call
-	jal fun_lb127
-	move $fp, $sp
-	subi $sp, $sp, 60
-	# call
-	jal fun_lb128
-	move $fp, $sp
-	subi $sp, $sp, 48
-	# call
-	jal fun_lb129
-	move $fp, $sp
-	subi $sp, $sp, 16
-	# call
-	jal fun_lb132
-	move $fp, $sp
-	subi $sp, $sp, 16
-	# call
-	jal fun_lb138
+	sw $t0, _data_g_var_int1
+	li $t0, 11
+	sw $t0, _data_g_var_int2
 	# print
 	li $v0, 4
-	la $a0, _str_1
+	la $a0, _str_32
+	syscall
+	lw $t0, 28($sp)
+	lb $t0, _data_g_array_char+0
+	sw $t0, 28($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_33
 	syscall
 	li $v0, 1
-	lw $a0, _data_judge
+	lw $a0, 28($sp)
 	syscall
 	li $v0, 4
 	la $a0, _str_endl
 	syscall
-	j end_main_lb1
+	lw $t0, 32($sp)
+	lb $t0, _data_g_array_char+1
+	sw $t0, 32($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_34
+	syscall
+	li $v0, 1
+	lw $a0, 32($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	lw $t0, 36($sp)
+	lb $t0, _data_g_array_char+2
+	sw $t0, 36($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_35
+	syscall
+	li $v0, 1
+	lw $a0, 36($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_36
+	syscall
+	li $v0, 1
+	lw $a0, _data_g_var_int1
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_37
+	syscall
+	li $v0, 1
+	lw $a0, _data_g_var_int2
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	lw $t0, 40($sp)
+	lb $t0, _data_g_array_char+0
+	sw $t0, 40($sp)
+	lw $t0, 44($sp)
+	lb $t0, _data_g_array_char+1
+	sw $t0, 44($sp)
+	# calc
+	lw $t0, 40($sp)
+	lw $t1, 44($sp)
+	add $t0, $t0, $t1
+	sw $t0, 48($sp)
+	lw $t0, 48($sp)
+	sw $t0, _data_g_var_int1
+	lw $t0, 52($sp)
+	lb $t0, _data_g_array_char+2
+	sw $t0, 52($sp)
+	lw $t0, 56($sp)
+	lb $t0, _data_g_array_char+0
+	sw $t0, 56($sp)
+	# calc
+	lw $t0, 52($sp)
+	lw $t1, 56($sp)
+	sub $t0, $t0, $t1
+	sw $t0, 60($sp)
+	lw $t0, 60($sp)
+	sw $t0, _data_g_var_int2
+	# print
+	li $v0, 4
+	la $a0, _str_36
+	syscall
+	li $v0, 1
+	lw $a0, _data_g_var_int1
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_37
+	syscall
+	li $v0, 1
+	lw $a0, _data_g_var_int2
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	li $t0, 122
+	sb $t0, _data_g_var_char1
+	li $t0, 120
+	sb $t0, _data_g_var_char2
+	# print
+	li $v0, 4
+	la $a0, _str_38
+	syscall
+	li $v0, 11
+	lb $a0, _data_g_var_char1
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_39
+	syscall
+	li $v0, 11
+	lb $a0, _data_g_var_char2
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_40
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_41
+	syscall
+	li $v0, 1
+	lw $a0, 16($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_42
+	syscall
+	# read
+	li $v0, 5
+	syscall
+	sw $v0, 8($sp)
+	move $fp, $sp
+	subi $sp, $sp, 28
+	lw $t0, 8($fp)
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 64($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_43
+	syscall
+	li $v0, 1
+	lw $a0, 64($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_44
+	syscall
+	move $fp, $sp
+	subi $sp, $sp, 28
+	lw $t0, 8($fp)
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 68($sp)
+	lw $t0, 68($sp)
+	sw $t0, 12($sp)
+	move $fp, $sp
+	subi $sp, $sp, 28
+	lw $t0, 8($fp)
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 72($sp)
+	# calc
+	lw $t0, 4($sp)
+	lw $t1, 8($sp)
+	mul $t0, $t0, $t1
+	sw $t0, 76($sp)
+	# calc
+	lw $t0, 76($sp)
+	li $t1, -5
+	div $t0, $t1
+	mflo $t0
+	sw $t0, 80($sp)
+	# calc
+	lw $t0, 80($sp)
+	li $t1, 6
+	mul $t0, $t0, $t1
+	sw $t0, 84($sp)
+	# calc
+	lw $t0, 72($sp)
+	lw $t1, 84($sp)
+	add $t0, $t0, $t1
+	sw $t0, 88($sp)
+	# calc
+	lw $t0, 4($sp)
+	li $t1, -6
+	div $t0, $t1
+	mflo $t0
+	sw $t0, 92($sp)
+	# calc
+	lw $t0, 92($sp)
+	lw $t1, 8($sp)
+	div $t0, $t1
+	mflo $t0
+	sw $t0, 96($sp)
+	# calc
+	lw $t0, 96($sp)
+	li $t1, 2
+	mul $t0, $t0, $t1
+	sw $t0, 100($sp)
+	move $fp, $sp
+	subi $sp, $sp, 28
+	li $t0, 3
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 104($sp)
+	# calc
+	lw $t0, 100($sp)
+	lw $t1, 104($sp)
+	mul $t0, $t0, $t1
+	sw $t0, 108($sp)
+	# calc
+	lw $t0, 108($sp)
+	li $t1, 6
+	mul $t0, $t0, $t1
+	sw $t0, 112($sp)
+	# calc
+	lw $t0, 88($sp)
+	lw $t1, 112($sp)
+	sub $t0, $t0, $t1
+	sw $t0, 116($sp)
+	lw $t0, 116($sp)
+	sw $t0, 12($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_45
+	syscall
+	li $v0, 1
+	lw $a0, 12($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# print
+	li $v0, 4
+	la $a0, _str_46
+	syscall
+ while_lb33:
+	lw $t0, 4($sp)
+	li $t1, 10
+	bge $t0, $t1, end_while_lb32
+	# calc
+	lw $t0, 4($sp)
+	li $t1, 1
+	add $t0, $t0, $t1
+	sw $t0, 120($sp)
+	lw $t0, 120($sp)
+	lw $t1, 4($sp)
+	sll $t2, $t1, 2
+	sw $t0, _data_g_array_int($t2)
+	# calc
+	lw $t0, 4($sp)
+	li $t1, 1
+	add $t0, $t0, $t1
+	sw $t0, 124($sp)
+	lw $t0, 124($sp)
+	sw $t0, 4($sp)
+	j while_lb33
+ end_while_lb32:
+	# print
+	li $v0, 4
+	la $a0, _str_47
+	syscall
+ while_lb35:
+	lw $t0, 4($sp)
+	li $t1, 10
+	bge $t0, $t1, end_while_lb34
+	lw $t0, 128($sp)
+	lw $t1, 4($sp)
+	sll $t2, $t1, 2
+	lw $t0, _data_g_array_int($t2)
+	sw $t0, 128($sp)
+	# print
+	li $v0, 4
+	la $a0, _str_48
+	syscall
+	li $v0, 1
+	lw $a0, 128($sp)
+	syscall
+	li $v0, 4
+	la $a0, _str_endl
+	syscall
+	# calc
+	lw $t0, 4($sp)
+	li $t1, 1
+	add $t0, $t0, $t1
+	sw $t0, 132($sp)
+	lw $t0, 132($sp)
+	sw $t0, 4($sp)
+	j while_lb35
+ end_while_lb34:
+	move $fp, $sp
+	subi $sp, $sp, 4
+	# call
+	jal fun_lb4
+	move $fp, $sp
+	subi $sp, $sp, 28
+	lw $t0, 8($fp)
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb29
+	sw $v0, 136($sp)
+	move $fp, $sp
+	subi $sp, $sp, 24
+	lw $t0, 136($fp)
+	sw $t0, 4($sp)
+	lw $t0, 4($fp)
+	sw $t0, 8($sp)
+	li $t0, 2
+	sw $t0, 12($sp)
+	li $t0, 97
+	sw $t0, 16($sp)
+	li $t0, 97
+	sw $t0, 20($sp)
+	# call
+	jal fun_lb5
+	move $fp, $sp
+	subi $sp, $sp, 4
+	# call
+	jal fun_lb6
+	move $fp, $sp
+	subi $sp, $sp, 8
+	li $t0, 1
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb22
+	move $fp, $sp
+	subi $sp, $sp, 8
+	li $t0, 2
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb22
+	move $fp, $sp
+	subi $sp, $sp, 8
+	li $t0, 3
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb22
+	move $fp, $sp
+	subi $sp, $sp, 8
+	li $t0, 97
+	sw $t0, 4($sp)
+	# call
+	jal fun_lb22
+	move $fp, $sp
+	subi $sp, $sp, 12
+	# call
+	jal fun_lb19
  end_main_lb1:

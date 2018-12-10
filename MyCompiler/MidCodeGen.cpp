@@ -28,11 +28,11 @@ Operator MidCodeGen::symbol2Operator(Symbol sy) {
 	}
 }
 
-SymbolItem* MidCodeGen::genTemp() {
+SymbolItem* MidCodeGen::genTemp(Type t) {
 	stringstream ss;
 	ss << "!Temp_" << tmp_n++;
 	SymbolItem* r = new SymbolItem();
-	r->typ = Type::inttp;
+	r->typ = t;
 	r->obj = tmp;
 	r->ident_name = ss.str();
 	tab.enterTemp(r);

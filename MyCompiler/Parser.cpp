@@ -722,8 +722,6 @@ void Parser::switchStatement() {
 			while (current_token.getSymbol() == casesy) {
 				caseStatement(tmpExp, end_switch, &caseTab);
 			}
-			fsys.erase({ Symbol::casesy });
-			test({ defaultsy }, fsys, 26);
 			if (current_token.getSymbol() == defaultsy) {
 				defaultStatement();
 			}
@@ -907,7 +905,7 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 	}
 	codeGen.emit(Operator::call, funItem, NULL, NULL);
 	if (funItem->hasRet) {
-		SymbolItem* returnValue = codeGen.genTemp();
+		SymbolItem* returnValue = codeGen.genTemp(funItem->typ);
 		codeGen.emit(Operator::stRetVal, returnValue, NULL, NULL);
 		// no need to restore, just load when use that var
 		codeGen.emit(Operator::restore, NULL, symTab.getFunItem(), NULL);

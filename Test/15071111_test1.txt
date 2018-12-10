@@ -12,9 +12,6 @@ char test_fun_foo1() {
 	char b;
 	return ('a');
 }
-int test_fun_foo2() {
-	return ('a'+'b');
-}
 
 void test_printf() {
 	printf("test_printf 1:");
@@ -103,10 +100,10 @@ void main() {
 	i = 1;
 	n = 2;
 	f = 3;
+	sameName = 321;
 	g_array_char[0] = 'a';
 	g_array_char[1] = 'b';
 	g_array_char[2] = test_fun_foo1();
-	sameName = test_fun_foo2();
 	g_var_int1 = g_const_int1 * g_const_int2;
 	g_var_int2 = g_const_char2 - g_const_char1;
 	printf("test assign statement:---------------");
@@ -149,7 +146,7 @@ void main() {
 	}
 
 	test_printf();
-	test_fun(F(n), i, g_const_int2, g_const_char1, 'a');
+	test_fun(F(n), i, g_const_int2, g_const_char1, 't');
 	test_if();
 	test_switch(1);
 	test_switch(2);

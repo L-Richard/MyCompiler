@@ -42,7 +42,7 @@ class MidCodeGen {
 public:
 	Operator symbol2Operator(Symbol sy);
 
-	SymbolItem* genTemp();	// create a temp var to compute  expression
+	SymbolItem* genTemp(Type t = Type::inttp);	// create a temp var to compute  expression
 
 	SymbolItem* genCon(Type typ, int value);
 
