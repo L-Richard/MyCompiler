@@ -16,17 +16,16 @@ void Parser::nextSym() {
 }
 
 void Parser::skip(SymSet fsys) {
-#ifdef DEBUG_Gramma_analysis
+#ifdef DEBUG_Gramma_analysis_skip
 	cout << "skip---------------------------" << endl;
 #endif
 	while (!fsys.count(current_token.getSymbol())) {
-#ifdef DEBUG_Gramma_analysis
+#ifdef DEBUG_Gramma_analysis_skip
 		cout << "\t" << current_token.getlc() << "ÐÐ:  symbol:"
 			 << Enum2Str(current_token.getSymbol()) << " \"" 
 			 << current_token.getIdentName() << "\" " << endl;
 #endif
 		nextSym();
-
 	}
 }
 
@@ -46,6 +45,7 @@ void Parser::testSemicolon() {
 	}
 	else {
 		// error
+		error_handler.reportErrorMsg(current_token, 26);
 		SymSet fsys = compoundBsys;
 		fsys.insert(eofsy);
 		fsys.insert(voidsy);
@@ -522,15 +522,17 @@ void Parser::statement() {
 					if (current_token.getSymbol() == Symbol::lsquare) {
 						SymSet fsys = statementBsys;
 						fsys.insert({ Symbol::rbrace, Symbol::becomes, Symbol::rsquare});
-						arrIndex = selector(fsys);
+						arrIndex = selector(tmp, fsys);
 					}
 				}
 				test({ becomes }, statementBsys, 10);
 				if (current_token.getSymbol() == Symbol::becomes) {
 					//////////////////////////////////////////////////////////////
+					nextSym();
+					Token errorToken = current_token;
 					SymbolItem * assignRet = assignStatement();
 					if (assignRet->typ > tmp->typ) {
-						error_handler.reportErrorMsg(current_token, 43);
+						error_handler.reportErrorMsg(errorToken, 43);
 					}
 					if (tmp->obj == ObjectiveType::arrayty) {
 						codeGen.emit(Operator::arrSt, assignRet, arrIndex, tmp);
@@ -558,7 +560,7 @@ void Parser::statement() {
 	}
 }
 
-SymbolItem* Parser::selector(SymSet fsys) {
+SymbolItem* Parser::selector(SymbolItem* item, SymSet fsys) {
 #ifdef DEBUG_Gramma_analysis
 	int lc = current_token.getlc();
 	std::cout << lc << "ÐÐ: ";
@@ -573,6 +575,9 @@ SymbolItem* Parser::selector(SymSet fsys) {
 		if (current_token.getSymbol() == Symbol::rsquare) {
 			nextSym();
 		}
+	}
+	if (r->obj == ObjectiveType::constty && item->arrayNumMax <= r->addr) {
+		error_handler.reportErrorMsg(current_token, 44);
 	}
 	return r;
 }
@@ -624,7 +629,9 @@ void Parser::returnStatement() {
 }
 
 SymbolItem* Parser::assignStatement() {
-	/* begin with '=', end with sym after semicolon*/
+	/* begin with first token after '=', end with sym after semicolon
+		check '=' outside
+	*/
 #ifdef DEBUG_Gramma_analysis
 	int lc = current_token.getlc();
 	std::cout << lc << "ÐÐ: ";
@@ -634,11 +641,7 @@ SymbolItem* Parser::assignStatement() {
 	fsys.insert({ Symbol::rbrace, Symbol::semicolon });
 	fsys.insert(expBsys.begin(), expBsys.end());
 	SymbolItem* r = NULL;
-	test({ Symbol::becomes }, fsys, 10);
-	if (current_token.getSymbol() == Symbol::becomes) {
-		nextSym();
-		r = expression(fsys);
-	}
+	r = expression(fsys);
 	// do something
 	testSemicolon();
 	if (r == NULL) {
@@ -856,8 +859,6 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 #endif // DEBUG_Gramma_analysis
 	SymbolItem* para = NULL;
 	list<Type> paraTyps = funItem->paraList;
-
-	test({ lparent }, fsys, 19);
 	if (current_token.getSymbol() == lparent) {
 		nextSym();
 		SymbolItem* paras = new SymbolItem();
@@ -1207,7 +1208,7 @@ SymbolItem* Parser::factor(SymSet fsys) {
 			if (tmpItem) {
 				switch (tmpItem->obj) {
 				case ObjectiveType::arrayty: {
-					SymbolItem* offset = selector(fsys);
+					SymbolItem* offset = selector(tmpItem, fsys);
 					SymbolItem* r = codeGen.genTemp();
 					codeGen.emit(Operator::arrLd, r, offset, tmpItem);
 					return r;
@@ -1259,7 +1260,10 @@ SymbolItem* Parser::factor(SymSet fsys) {
 		case Symbol::lparent: {
 			nextSym();
 			SymbolItem * r = expression(fsys);
-			r->typ = Type::inttp;
+			if (r->obj == ObjectiveType::constty) {
+				/* if (const_ident), create a new const SymbolItem, otherwise */ 
+				r = codeGen.genCon(Type::inttp, r->addr);
+			}
 			test({ rparent }, fsys, 0);
 			if (current_token.getSymbol() == rparent) {
 				nextSym();

@@ -30,7 +30,7 @@ private:
 	void constDefinition();
 	void varDeclaration();
 	int  signedInt(SymSet fsys);
-	SymbolItem* selector(SymSet fsys);		//* return the index: [exp], 
+	SymbolItem* selector(SymbolItem* item,SymSet fsys);		//* return the index: [exp], 
 	void paraList();
 	SymbolItem* function();
 	void statement();

@@ -23,7 +23,7 @@ public:
 	void print() {
 		for (auto item = errorMsgs.begin(); item != errorMsgs.end(); item++) {
 			cout << "Error: " << item->lc << "ÐÐ, " << item->cc << "ÁÐ: " << "error type: "
-				<< item->type;
+				<< item->type << endl;
 		}
 	}
 	Error();
