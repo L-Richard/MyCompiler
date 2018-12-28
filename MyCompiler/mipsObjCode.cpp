@@ -263,7 +263,8 @@ void mipsObjCode::ret(SymbolItem* fun, SymbolItem* retItem) {
 		if (retItem->obj == ObjectiveType::constty)
 			add(MipsCode::li, $v0, int2string(retItem->addr));
 		else
-			add(MipsCode::lw, $v0, int2string(retItem->addr), $sp);
+			loadReg(retItem, $v0);
+			//add(MipsCode::lw, $v0, int2string(retItem->addr), $sp);
 		/* lb or lw
 		if (fun->typ == Type::chartp) 
 			add(MipsCode::lb, $v0, int2string(retItem->addr), $sp);

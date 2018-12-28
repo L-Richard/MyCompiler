@@ -567,9 +567,11 @@ SymbolItem* Parser::selector(SymbolItem* item, SymSet fsys) {
 	std::cout << "selector Óï¾ä" << endl;
 #endif // DEBUG_Gramma_analysis
 	SymbolItem* r = NULL;
+	Token errorToken;
 	if (current_token.getSymbol() == Symbol::lsquare) {
 		nextSym();	// read a int con
 		fsys.insert({ rsquare });
+		errorToken = current_token;
 		r = expression(fsys);
 		test({ Symbol::rsquare }, expBsys, 14);
 		if (current_token.getSymbol() == Symbol::rsquare) {
@@ -577,7 +579,7 @@ SymbolItem* Parser::selector(SymbolItem* item, SymSet fsys) {
 		}
 	}
 	if (r->obj == ObjectiveType::constty && item->arrayNumMax <= r->addr) {
-		error_handler.reportErrorMsg(current_token, 44);
+		error_handler.reportErrorMsg(errorToken, 44);
 	}
 	return r;
 }
@@ -1109,7 +1111,7 @@ SymbolItem* Parser::expression(SymSet fsys) {
 		item1 = item(itemFsys);
 		if (sy == Symbol::minus) {
 			if (item1->obj == ObjectiveType::constty) {
-				item1 = codeGen.genCon(item1->typ, -item1->addr);
+				item1 = codeGen.genCon(Type::inttp, -item1->addr);
 			}
 			else {
 				r = codeGen.genTemp();
@@ -1263,6 +1265,7 @@ SymbolItem* Parser::factor(SymSet fsys) {
 			if (r->obj == ObjectiveType::constty) {
 				/* if (const_ident), create a new const SymbolItem, otherwise */ 
 				r = codeGen.genCon(Type::inttp, r->addr);
+				// r->obj
 			}
 			test({ rparent }, fsys, 0);
 			if (current_token.getSymbol() == rparent) {
