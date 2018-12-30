@@ -26,6 +26,7 @@ private:
 	int stack = 0;
 
 public:
+	void peepHole();
 	void translate();
 	void enterDataSeg();
 
@@ -70,7 +71,7 @@ public:
 		else
 			ins.push_back(Instruction(_op, " " + _des, ", " + _src1, ", " + _src2));
 	}
-	   	
+
 	string int2string(int i) {
 		stringstream ss;
 		ss << i;
@@ -88,6 +89,13 @@ public:
 
 	void printObjFile(string fileName) {
 		ofstream outfile;
+		
+		enterDataSeg();
+		text.push_back(".text");
+		for (auto item = ins.begin(); item != ins.end(); item++) {
+			text.push_back(item->printInstr());
+		}
+
 		outfile.open(fileName, ios::out | ios::trunc);
 		for (auto item = data.begin(); item != data.end(); item++)
 			outfile << *item << endl;

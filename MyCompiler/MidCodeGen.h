@@ -21,6 +21,12 @@ enum class Operator {
 	read, print,
 };
 
+enum class ConditionOptim {
+	unknownCon,
+	trueCon,
+	falseCon,
+};
+
 struct Quadruples {
 	/* use SymbolItem as expressiong item, and generate a name for temp */
 	Operator op;
@@ -39,6 +45,12 @@ class MidCodeGen {
 	int case_n = 0;
 	int switch_n = 0;
 	int fun_n = 0;
+
+	/* condition result when condition expression is consist of
+		two const value or record switch case compare result
+	*/
+	ConditionOptim con = ConditionOptim::unknownCon; 
+
 public:
 	Operator symbol2Operator(Symbol sy);
 
@@ -68,6 +80,26 @@ public:
 		case labelType::end_case_lb:	return "end_case_lb";
 		case labelType::end_switch_lb:	return "end_switch_lb";
 		default:						return "foo_label";
+		}
+	}
+	void setFalseCon() {
+		this->con = ConditionOptim::falseCon;
+	}
+	void setTrueCon() {
+		this->con = ConditionOptim::trueCon;
+	}
+	void restoreCon() {
+		this->con = ConditionOptim::unknownCon;
+	}
+	ConditionOptim getCon() {
+		return this->con;
+	}
+	void eraseLabel(SymbolItem * label) {
+		for (auto item = midCodes.begin(); item != midCodes.end(); item++) {
+			if (item->op == Operator::setLabel && item->dst->ident_name == label->ident_name) {
+				midCodes.erase(item);
+				break;
+			}
 		}
 	}
 

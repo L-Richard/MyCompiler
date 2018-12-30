@@ -56,6 +56,31 @@ private:
 	void read();
 	void write();
 
+	int computeConditionVal(int a, int b, Symbol opSym) {
+		/* compute condition result
+		return 1 if true, 0 if false, -1 if error.
+		*/
+		if (opSym == Symbol::leq) {
+			return a <= b;
+		}
+		else if (opSym == Symbol::les) {
+			return a < b;
+		}
+		else if (opSym == Symbol::eql) {
+			return a == b;
+		}
+		else if (opSym == Symbol::neq) {
+			return a != b;
+		}
+		else if (opSym == Symbol::gtr) {
+			return a > b;
+		}
+		else if (opSym == Symbol::geq) {
+			return a >= b;
+		}
+		else
+			return -1;
+	}
 	string int2str(int i) {
 		stringstream ss;
 		ss << i;

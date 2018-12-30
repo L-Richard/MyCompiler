@@ -1,34 +1,13 @@
 .data
-	.align 2
-	_data_count: .space 4
-	.align 2
-	_data_g_array_char: .space 3
-	.align 2
-	_data_g_array_int: .space 40
-	.align 2
-	_data_g_var_char1: .space 1
-	.align 2
-	_data_g_var_char2: .space 1
-	.align 2
-	_data_g_var_int1: .space 4
-	.align 2
-	_data_g_var_int2: .space 4
 	_str_endl: .asciiz "\n"
 .text
-	j main_lb0
  main_lb0:
-	li $t0, 0
-	sw $t0, _data_count
-	li $t0, 1
-	sw $t0, 4($sp)
-	li $t0, 2
-	sw $t0, 8($sp)
-	li $t0, 3
+ while_lb5:
+	# calc
+	lw $t0, 4($sp)
+	li $t1, 2
+	add $t0, $t0, $t1
 	sw $t0, 12($sp)
-	li $t0, 97
-	sb $t0, _data_g_array_char+0
-	li $t0, 98
-	sb $t0, _data_g_array_char+1
-	li $t0, 97
-	sb $t0, 20($sp)
+	sw $t0, 4($sp)
+	j while_lb5
  end_main_lb1:

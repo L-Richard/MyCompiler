@@ -52,28 +52,6 @@ private:
 	string des = "";
 	string src1 = "";
 	string src2 = "";
-public:
-	Instruction(MipsCode _op) {
-		op = getOpName(_op);
-	}
-
-	Instruction(MipsCode _op, string _des) {
-		op = getOpName(_op);
-		des = _des;
-	}
-
-	Instruction(MipsCode _op, string _des, string _src1) {
-		op = getOpName(_op);
-		des = _des;
-		src1 = _src1;
-	}
-
-	Instruction(MipsCode _op, string _des, string _src1, string _src2) {
-		op = getOpName(_op);
-		des = _des;
-		src1 = _src1;
-		src2 = _src2;
-	}
 
 	string getOpName(MipsCode _opcode) {
 	switch (_opcode) 
@@ -119,6 +97,29 @@ public:
 		}
 	}
 
+public:
+	Instruction(MipsCode _op) {
+		op = getOpName(_op);
+	}
+
+	Instruction(MipsCode _op, string _des) {
+		op = getOpName(_op);
+		des = _des;
+	}
+
+	Instruction(MipsCode _op, string _des, string _src1) {
+		op = getOpName(_op);
+		des = _des;
+		src1 = _src1;
+	}
+
+	Instruction(MipsCode _op, string _des, string _src1, string _src2) {
+		op = getOpName(_op);
+		des = _des;
+		src1 = _src1;
+		src2 = _src2;
+	}
+
 	string printInstr() {
 		string r = "";
 		if (op != "") {
@@ -126,6 +127,19 @@ public:
 		}
 		r = r + op + des + src1 + src2;
 		return r;
+	}
+
+	string getOp() {
+		return this->op;
+	}
+	string getDst() {
+		return this->des;
+	}
+	string getS1() {
+		return this->src1;
+	}
+	string getS2() {
+		return this->src2;
 	}
 
 	~Instruction();

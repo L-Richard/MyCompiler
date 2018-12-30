@@ -67,6 +67,9 @@ SymbolItem* MidCodeGen::genLabel(labelType l) {
 }
 
 void MidCodeGen::setLabel(SymbolItem* label) {
+	if (this->con == ConditionOptim::falseCon) {
+		return;
+	}
 	Quadruples tmp;
 	tmp.op = Operator::setLabel;
 	tmp.dst = label;
@@ -74,6 +77,9 @@ void MidCodeGen::setLabel(SymbolItem* label) {
 }
 
 void MidCodeGen::emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem* src2) {
+	if (this->con == ConditionOptim::falseCon) {
+		return;
+	}
 	Quadruples tmp;
 	tmp.op = op;
 	tmp.src1 = src1;

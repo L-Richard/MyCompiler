@@ -25,8 +25,43 @@ mipsObjCode::~mipsObjCode()
 }
 
 
+void mipsObjCode::peepHole() {
+	for (auto item = ins.begin(); item != ins.end(); item++) {
+		if (item->getOp() == "sw") {
+			auto tmp = next(item, 1);
+			while (tmp != ins.end()
+				&& tmp->getOp() == "lw"
+				&& tmp->getDst() == item->getDst()
+				&& tmp->getS1() == item->getS1()
+				&& tmp->getS2() == item->getS2()) {
+
+				ins.erase(tmp);
+				tmp = next(item, 1);
+			}
+		}
+		if (item->getOp() == "j") {
+			bool remove_j = false;
+			for (auto tmp = next(item, 1); tmp != ins.end() && tmp->getOp() == ""; tmp++) {
+				if (tmp->getDst() == item->getDst() + ":") {
+					remove_j = true;
+				}
+			}
+			if (remove_j) {
+				// remove item
+				if (item == ins.begin()) {
+					ins.erase(item);
+					item = ins.begin();
+				}
+				else {
+					item--;
+					ins.erase(next(item, 1));
+				}
+			}
+		}
+	}
+}
+
 void mipsObjCode::translate() {
-	enterDataSeg();
 	for (auto item = midCodes.begin(); item != midCodes.end(); item++) {
 		switch (item->op) {
 		case Operator::assignOp:
@@ -83,10 +118,8 @@ void mipsObjCode::translate() {
 			print(item->src1, item->src2);				break;
 		}
 	}
-	text.push_back(".text");
-	for (auto item = ins.begin(); item != ins.end(); item++) {
-		text.push_back(item->printInstr());
-	}
+	// optimize:
+	this->peepHole();
 }
 
 void mipsObjCode::enterDataSeg() {

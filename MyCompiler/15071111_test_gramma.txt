@@ -1,21 +1,15 @@
-int  g_is[10];
-char g_cs[3];
-
-char cc(){
-	return (('a'));
-}
-
-int ii(){
-	return ('a'+1);
-}
 void main() {
-	char cs[10];
-	int is[10];
-	cs[0] = cc();
-	cs[1] = ('a');
+	const int ci = 1;
+	int a;
+	
+	while (ci - 1) {
+		a = a + 1;
 
-	is[0] = cc();
-	is[1] =ii();
+	}
+
+	while (ci) {
+		a = a + 2;
+	}
 
 }
 
