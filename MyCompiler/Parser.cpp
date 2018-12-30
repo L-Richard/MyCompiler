@@ -538,7 +538,12 @@ void Parser::statement() {
 						codeGen.emit(Operator::arrSt, assignRet, arrIndex, tmp);
 					}
 					else {
+						/* optimization:
+						   if assign statement is not array assig, we can
+						   use the vat on the left, remove extra !Temp.
+						*/
 						codeGen.emit(Operator::assignOp, tmp, assignRet, NULL);
+						codeGen.opt_assign(tmp, assignRet);
 					}
 				}
 				else {
@@ -665,6 +670,7 @@ void Parser::ifStatement(SymSet fsys) {
 	test({ Symbol::lparent }, statementBsys, 19);
 	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
+		codeGen.opt_if_record_start();	// optimize blank if statement
 		condition(endifLabel);
 		/////////////////////////////////////////////////////////////////
 		test({ Symbol::rparent }, fsys, 20);
@@ -679,10 +685,13 @@ void Parser::ifStatement(SymSet fsys) {
 #endif // DEBUG_Gramma_analysis
 		}
 		if (statementBsys.count(current_token.getSymbol())) {
+			codeGen.opt_if_record_statement();
 			statement();
 		}
 		if (codeGen.getCon() == ConditionOptim::unknownCon) {
 			codeGen.setLabel(endifLabel);
+			codeGen.opt_if_record_end();
+			codeGen.opt_if_optimize();
 		}
 		codeGen.restoreCon();
 	}
@@ -1147,6 +1156,13 @@ void Parser::condition(SymbolItem* label) {
 		}
 		else {	// only need jump when exp is not const
 			Operator op = codeGen.symbol2Operator(sy);
+			if (exp1->obj == ObjectiveType::constty) {
+				// if exp1 is const, then exchange exp1 and exp2.
+				SymbolItem* tmpExp = exp1;
+				exp1 = exp2;
+				exp2 = tmpExp;
+				op = codeGen.op_lr(op);
+			}
 			codeGen.emit(op, label, exp1, exp2);
 		}
 	}

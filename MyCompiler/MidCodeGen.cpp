@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "MidCodeGen.h"
 #include <sstream>
+#include <fstream>
 
 MidCodeGen::MidCodeGen(SymbolTable&tab) :tab(tab)
 {
@@ -24,6 +25,18 @@ Operator MidCodeGen::symbol2Operator(Symbol sy) {
 	case Symbol::geq:	return Operator::geq;
 	case Symbol::les:	return Operator::les;
 	case Symbol::leq:	return Operator::leq;
+	default:			return Operator::notOp;
+	}
+}
+Operator MidCodeGen::op_lr(Operator op) {
+	// only logical operator need left right change
+	switch (op) {
+	case Operator::eql:
+	case Operator::neq: return op;
+	case Operator::gtr:	return Operator::les;
+	case Operator::geq:	return Operator::leq;
+	case Operator::les:	return Operator::gtr;
+	case Operator::leq: return Operator::geq;
 	default:			return Operator::notOp;
 	}
 }
@@ -88,22 +101,37 @@ void MidCodeGen::emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem
 	midCodes.push_back(tmp);
 }
 
-void MidCodeGen::print() {
+void MidCodeGen::print(string filename) {
+	ofstream  outfile;
+	outfile.open(filename);
 	for (auto item = midCodes.begin(); item != midCodes.end(); item++) {
-		cout << op2Str(item->op) << ", ";
-		if (item->src1 != NULL)
-			cout << item->src1->ident_name << ", ";
-		else 
-			cout << "\t,";
-		if (item->src2 != NULL) 
-			cout << item->src2->ident_name << ", ";
-		else 
-			cout << "\t,";
-		if (item->dst != NULL)
-			cout << item->dst->ident_name << ", ";
-		else
-			cout << "\t,";
-		cout << endl;
+		outfile.width(15);
+		outfile << op2Str(item->op);
+		if (item->src1 != NULL) {
+			outfile.width(15);
+			outfile << item->src1->ident_name;
+		}
+		else {
+			outfile.width(15);
+			outfile << " ";
+		}
+		if (item->src2 != NULL) {
+			outfile.width(15);
+			outfile << item->src2->ident_name;
+		}
+		else {
+			outfile.width(15);
+			outfile << " ";
+		}
+		if (item->dst != NULL) {
+			outfile.width(15);
+			outfile << item->dst->ident_name;
+		}
+		else {
+			outfile.width(15);
+			outfile << " ";
+		}
+		outfile << endl;
 	}
 }
 

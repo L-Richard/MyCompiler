@@ -27,7 +27,7 @@ mipsObjCode::~mipsObjCode()
 
 void mipsObjCode::peepHole() {
 	for (auto item = ins.begin(); item != ins.end(); item++) {
-		if (item->getOp() == "sw") {
+		if (item->getOp() == "sw" || item->getOp() == "lw") {
 			auto tmp = next(item, 1);
 			while (tmp != ins.end()
 				&& tmp->getOp() == "lw"
@@ -235,7 +235,12 @@ void mipsObjCode::compare(Operator op, SymbolItem* dst, SymbolItem*src1, SymbolI
 	otherwise we can optimize the code when generate mid code
 	*/ 
 	string reg0 = loadReg(src1, $t0);
-	string reg1 = loadReg(src2, $t1);
+	string reg1 = "";	// here reg1 can be a number or a register
+	if (src2->obj == ObjectiveType::constty)
+		reg1 = int2string(src2->addr);
+	else
+		reg1 = loadReg(src2, $t1);
+
 	switch (op) {
 	case Operator::eql: add(MipsCode::bne, reg0, reg1, dst->ident_name); break;
 	case Operator::neq: add(MipsCode::beq, reg0, reg1, dst->ident_name); break;

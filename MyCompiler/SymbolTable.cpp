@@ -155,3 +155,14 @@ void SymbolTable::funDone() {
 	stack = 4;
 }
 
+
+/************************* Optimization  ****************************/
+void SymbolTable::removeLastTemp(SymbolItem* Temp) {
+	ftab->erase(Temp->ident_name);
+	stack -= INTSIZE;
+	lastFunItem->tmpSize -= INTSIZE;
+}
+void SymbolTable::killVar(SymbolItem* var) {
+
+}
+

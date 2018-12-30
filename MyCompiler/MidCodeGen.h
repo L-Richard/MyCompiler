@@ -45,28 +45,24 @@ class MidCodeGen {
 	int case_n = 0;
 	int switch_n = 0;
 	int fun_n = 0;
-
+	
+	// optimization
 	/* condition result when condition expression is consist of
 		two const value or record switch case compare result
 	*/
 	ConditionOptim con = ConditionOptim::unknownCon; 
+	// blank if optimization, this three index means offset after 
+	// midCodes.begin()
+	int opt_if_start_index = 0;
+	int opt_if_end_index = 0;
+	int opt_if_statement_index = 0;
 
 public:
+	void print(string filename);	// print midcodes 
+
+	// four functional method
 	Operator symbol2Operator(Symbol sy);
-
-	SymbolItem* genTemp(Type t = Type::inttp);	// create a temp var to compute  expression
-
-	SymbolItem* genCon(Type typ, int value);
-
-	SymbolItem* genLabel(labelType l);
-	// genLabel: 1.
-
-	void setLabel(SymbolItem* label);
-
-	void emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem* src2);
-	// compute, 
-	
-	void print();
+	Operator op_lr(Operator op);
 	string op2Str(Operator op);
 	string label2str(labelType l) {
 		switch (l) {
@@ -82,6 +78,67 @@ public:
 		default:						return "foo_label";
 		}
 	}
+	
+	// generators
+	SymbolItem* genTemp(Type t = Type::inttp);	// create a temp var to compute  expression
+	SymbolItem* genCon(Type typ, int value);
+	SymbolItem* genLabel(labelType l);
+	void setLabel(SymbolItem* label);
+
+	// emit middle code 
+	void emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem* src2);
+	
+	
+	/***************************    optimization:    *****************************/
+	// assign optimization: remove extra !Temp var
+	// call this function after parse.
+	void opt_assign(SymbolItem *left_var, SymbolItem *assignRet) {
+		auto item = midCodes.end() - 1;
+		// use if to check assign right var.
+		if (item->op == Operator::assignOp
+			&& item->src1->ident_name == assignRet->ident_name
+			&& assignRet->obj == ObjectiveType::tmp) {
+			auto lastExp = item - 1;
+			lastExp->dst = left_var;
+			midCodes.erase(item);
+			// ????????????????????????????????????????????????????????????????????????
+			/* how to remove !Temp in assignRet from symbolTable
+			   this !Temp must be the last !Temp, and we can just go back to the moment that 
+			   !Temp hasnot been generate.
+			*/
+			tab.removeLastTemp(assignRet);
+		}
+	}
+
+
+	// if statement: remove blank if statement
+	void opt_if_record_start() {
+		// record current tail midcode index
+		opt_if_start_index = midCodes.end()-midCodes.begin();
+	}
+	void opt_if_record_statement() {
+		// record before statement
+		opt_if_statement_index = midCodes.end()-midCodes.begin();
+	}
+	void opt_if_record_end() {
+		// record after set end_if label
+		opt_if_end_index = midCodes.end()-midCodes.begin();
+	}
+	void opt_if_optimize() {
+		if (opt_if_end_index - opt_if_statement_index == 1) {
+			// the difference is 1 means no statement, optimize
+			auto item = midCodes.begin() + opt_if_start_index;
+			while (item != midCodes.end()) {
+				midCodes.erase(item);
+				item = midCodes.begin() + opt_if_start_index;
+			}
+		}
+		opt_if_start_index = 0;
+		opt_if_statement_index = 0;
+		opt_if_end_index = 0;
+	}
+
+
 	void setFalseCon() {
 		this->con = ConditionOptim::falseCon;
 	}
@@ -96,17 +153,19 @@ public:
 	}
 	void eraseLabel(SymbolItem * label) {
 		for (auto item = midCodes.begin(); item != midCodes.end(); item++) {
-			if (item->op == Operator::setLabel && item->dst->ident_name == label->ident_name) {
+			if (item->op == Operator::setLabel && item->src1->ident_name == label->ident_name) {
 				midCodes.erase(item);
 				break;
 			}
 		}
 	}
 
-
 	vector<Quadruples>& getMidCodes() {
 		return midCodes;
 	}
+	
+	
+	
 	MidCodeGen(SymbolTable &tab);
 
 	~MidCodeGen();

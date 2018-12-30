@@ -28,7 +28,7 @@ struct SymbolItem {
 	bool isConst = false;
 	SymbolItem* exp_left = NULL;
 	SymbolItem* exp_right = NULL;
-	// function 
+	// function
 	map<string, SymbolItem*> *link = NULL;	// function tab
 	SymbolItem* fun_label = NULL;
 	list<Type> paraList;
@@ -38,6 +38,7 @@ struct SymbolItem {
 	// label
 	labelType lab;
 
+	// function symbol item
 	int totalSize = 0;		// totalSize = paraSize + tmpSize
 	int paraSize = 0;		// 
 	int tmpSize = 0;
@@ -58,15 +59,9 @@ private:
 	*/
 	int stack = 4;	// 4: $ra. record variable space in function
 	int level = 0;	// 0: global ident. 1: local ident
-public:
-	void enterFunc(Token name_token, enum Type typ, SymbolItem* label);
-	void enterVar(Token name_token, enum Type typ, int arraySize);
-	void enterPara(Token name_token, enum Type typ);
-	void enterConst(Token name_token, enum Type typ, int constValue);
-	void enterTemp(SymbolItem* tmp);
-	SymbolItem* search(Token name);
-	void funDone();
 
+
+	// private method:
 	void align() {
 		int r = stack % 4;
 		int q = stack / 4;
@@ -82,12 +77,30 @@ public:
 		}
 	}
 
+
+public:
+	void enterFunc(Token name_token, enum Type typ, SymbolItem* label);
+	void enterVar(Token name_token, enum Type typ, int arraySize);
+	void enterPara(Token name_token, enum Type typ);
+	void enterConst(Token name_token, enum Type typ, int constValue);
+	void enterTemp(SymbolItem* tmp);
+	SymbolItem* search(Token name);
+	void funDone();
+
+	// get method
 	SymbolItem* getFunItem() {
 		return lastFunItem;
 	}
 	map<string, SymbolItem*>& getTab() {
 		return symTab;
 	}
+
+	// optimization:
+	void removeLastTemp(SymbolItem* Temp);
+	void killVar(SymbolItem* var);	
+	// set some var not active, and will never be uesd
+
+
 
 	SymbolTable(Error&error_handler);
 	~SymbolTable();
