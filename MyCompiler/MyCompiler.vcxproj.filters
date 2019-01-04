@@ -51,6 +51,15 @@
     <ClInclude Include="c0_enum.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DagGraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalRegs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RegAdmin.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -81,6 +90,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Instruction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DagGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalRegs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RegAdmin.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

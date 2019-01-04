@@ -1,6 +1,7 @@
 #pragma once
 #include <set>
 #include "Token.h"
+
 typedef set<Symbol> SymSet;
 const SymSet typeSys = {
 	intsy, 
@@ -72,7 +73,11 @@ const SymSet expBsys = {
 	Symbol::charcon,
 };
 
+const set<string> regSet = {
+	"$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
+	"$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "$t9",
 
+};
 
 const int INTSIZE = 4;
 const int CHARSIZE = 1;

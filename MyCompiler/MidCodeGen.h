@@ -30,9 +30,9 @@ enum class ConditionOptim {
 struct Quadruples {
 	/* use SymbolItem as expressiong item, and generate a name for temp */
 	Operator op;
+	SymbolItem * dst  = NULL;
 	SymbolItem * src1 = NULL;
 	SymbolItem * src2 = NULL;
-	SymbolItem * dst  = NULL;
 };
 
 class MidCodeGen {
@@ -58,13 +58,13 @@ class MidCodeGen {
 	int opt_if_statement_index = 0;
 
 public:
-	void print(string filename);	// print midcodes 
+	static void print(string filename, vector<Quadruples> & codes);	// print midcodes 
 
 	// four functional method
-	Operator symbol2Operator(Symbol sy);
-	Operator op_lr(Operator op);
-	string op2Str(Operator op);
-	string label2str(labelType l) {
+	static Operator symbol2Operator(Symbol sy);
+	static Operator op_lr(Operator op);
+	static string op2Str(Operator op);
+	static string label2str(labelType l) {
 		switch (l) {
 		case labelType::main_lb:		return "main_lb";
 		case labelType::end_main_lb:	return "end_main_lb";
@@ -93,20 +93,20 @@ public:
 	// assign optimization: remove extra !Temp var
 	// call this function after parse.
 	void opt_assign(SymbolItem *left_var, SymbolItem *assignRet) {
+		const set<Operator> s = { Operator::neg, 
+			Operator::minus, Operator::plus, Operator::slash, Operator::times };
 		auto item = midCodes.end() - 1;
 		// use if to check assign right var.
 		if (item->op == Operator::assignOp
 			&& item->src1->ident_name == assignRet->ident_name
 			&& assignRet->obj == ObjectiveType::tmp) {
 			auto lastExp = item - 1;
-			lastExp->dst = left_var;
-			midCodes.erase(item);
-			// ????????????????????????????????????????????????????????????????????????
-			/* how to remove !Temp in assignRet from symbolTable
-			   this !Temp must be the last !Temp, and we can just go back to the moment that 
-			   !Temp hasnot been generate.
-			*/
-			tab.removeLastTemp(assignRet);
+
+			if (s.count(lastExp->op)) {
+				lastExp->dst = left_var;
+				midCodes.erase(item);
+				tab.removeLastTemp(assignRet);
+			}
 		}
 	}
 

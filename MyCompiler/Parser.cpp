@@ -959,7 +959,7 @@ SymbolItem* Parser::call(SymSet fsys, SymbolItem* funItem) {
 		// ±£¥Êœ÷≥°
 		codeGen.emit(Operator::save, NULL, symTab.getFunItem(), funItem);
 		// store the paras into the stack
-		codeGen.emit(Operator::stPara, NULL, paras, NULL);
+		codeGen.emit(Operator::stPara, NULL, paras, funItem);
 		test({ Symbol::rparent }, fsys, 20);
 		if (current_token.getSymbol() == rparent) {
 			nextSym();
@@ -1138,9 +1138,9 @@ void Parser::condition(SymbolItem* label) {
 	if (exp2 != NULL) {
 		// check type
 		set<Type> tpSet = { Type::inttp, Type::chartp };
-		if (tpSet.count(exp1->typ) &&  tpSet.count(exp2->typ) && exp1->typ != exp2->typ) {
-			error_handler.reportErrorMsg(current_token, 30);
-		}
+		// if (tpSet.count(exp1->typ) &&  tpSet.count(exp2->typ) && exp1->typ != exp2->typ) {
+		// 	error_handler.reportErrorMsg(current_token, 30);
+		// }
 		if (exp1->obj == ObjectiveType::constty && exp2->obj == ObjectiveType::constty) {
 			int con = computeConditionVal(exp1->addr, exp2->addr, sy);
 			if (con == 0)

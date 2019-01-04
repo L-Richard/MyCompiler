@@ -10,7 +10,6 @@ const string $ra = "$ra";
 const string $v0 = "$v0";
 const string $t0 = "$t0";
 const string $t1 = "$t1";
-const string $t2 = "$t2";
 const string $a0 = "$a0";
 const string $0  = "$0";
 const string $t4 = "$t4";
@@ -62,7 +61,9 @@ void mipsObjCode::peepHole() {
 }
 
 void mipsObjCode::translate() {
+	enterDataSeg();
 	for (auto item = midCodes.begin(); item != midCodes.end(); item++) {
+		current_code = &*item;
 		switch (item->op) {
 		case Operator::assignOp:
 			assign(item->dst, item->src1);
@@ -93,7 +94,7 @@ void mipsObjCode::translate() {
 		case::Operator::save:
 			save(item->src1, item->src2);	break;
 		case Operator::stPara:
-			storePara(item->src1);			break;
+			storePara(item->src1, item->src2);			break;
 		case Operator::call:
 			call(item->dst);				break;
 		case Operator::st$ra:
@@ -101,7 +102,11 @@ void mipsObjCode::translate() {
 		case Operator::returnOp:
 			ret(item->dst, item->src1);	break;
 		case Operator::stRetVal:
-			storeMem($v0, item->dst);		break;
+			if (regTab.count(item->dst->allocated_reg)) {	// store return value， don't need restore
+				save_restore.erase(regTab[item->dst->allocated_reg]);
+			}
+			storeMem($v0, item->dst);		
+			break;
 		case Operator::restore:
 			restore(item->src1);			break;
 
@@ -139,13 +144,47 @@ void mipsObjCode::enterDataSeg() {
 	data.push_back(s);
 }
 
+void mipsObjCode::saveReg(SymbolItem* var, bool useFp) {
+	// 调用函数前save，
+	string stackPointer = useFp ? $fp : $sp;
+	if (var->saved == false && var->allocated_reg != "") {
+		add(MipsCode::sw, var->allocated_reg, int2string(var->addr), stackPointer);
+		var->saved = true;
+	}
+}
+
 string mipsObjCode::loadReg(SymbolItem* src, string reg, bool useFp) {
-	/*
-		the load_addr_value is true means that:
-		_$i =  addr -> use in multi function var parameter.
-		else means
-		_$i = *addr
-	*/
+	// get src's value from memory to a certain register 
+	//				or from src's register
+	/********************* optimiszation registers *******************************************/
+	if (src->allocated_reg != "") {
+		reg = src->allocated_reg;
+		if (src->isUsingReg) {	// isUsing 表示没有其他变量占用寄存器
+			if (src->isPara) {
+				if (regTab.count(src->allocated_reg) && regTab[src->allocated_reg] != src) {
+					regTab[src->allocated_reg]->isUsingReg = false;
+				}
+				regTab[src->allocated_reg] = src;
+			}
+			return src->allocated_reg;
+		}
+		// update reg table
+		if (regTab.count(reg) && regTab[reg] != src) {
+			regTab[reg]->isUsingReg = false;
+//			if (regTab[reg]->isGlobal && !regTab[reg]->saved) {
+//				// 保存同一个函数内的变量(可能也不必要)，不是同一个函数，调用时已保存
+//				saveReg(regTab[reg]);
+//			}
+		}
+		regTab[reg] = src;
+		src->isUsingReg = true;
+		if (src->initial) {	// 参数不可以在这里返回，需要initial=false
+			src->initial = false;
+			return src->allocated_reg;
+		}
+	}
+	/****************************************************************************/
+
 	string stackPointer = useFp ? $fp : $sp;
 	if (src->obj == ObjectiveType::constty) {
 		add(MipsCode::li, reg, int2string(src->addr));
@@ -173,8 +212,28 @@ string mipsObjCode::loadReg(SymbolItem* src, string reg, bool useFp) {
 }
 
 void mipsObjCode::storeMem(string reg, SymbolItem* dst) {
+	// put dst's value into reg
+	// store var value to register or memory
 	if (dst->obj == ObjectiveType::constty || dst == NULL)
 		fatal("storeMem", "dst obj error or dst is null", dst);
+
+	/********************* optimiszation registers *******************************************/
+	if (dst->allocated_reg != "") {
+		dst->isUsingReg = true;
+		dst->initial = false;
+		dst->saved = false;
+		if (regTab.count(dst->allocated_reg) && regTab[dst->allocated_reg] != dst) {
+			// saveReg(regTab[dst->allocated_reg]);
+			regTab[dst->allocated_reg]->isUsingReg = false;
+		}
+		regTab[dst->allocated_reg] = dst;
+		if (dst->allocated_reg != reg) {
+			add(MipsCode::move, dst->allocated_reg, reg);
+		}
+		return;
+	}
+	/****************************************************************************/
+
 	if (dst->level == 0) {
 		// global var
 		if (dst->typ == Type::chartp) {
@@ -198,36 +257,40 @@ void mipsObjCode::storeMem(string reg, SymbolItem* dst) {
 	}
 }
 
+//  ok 带常数计算可以再优化  ???????????????????????????????????????????????????????????????????????????????????
 void mipsObjCode::calculate(Operator op, SymbolItem* dst, SymbolItem*src1, SymbolItem*src2) {
 	add(MipsCode::note, "calc");
 	
+	string regDst = loadReg(dst, $t0);
 	string reg0 = loadReg(src1, $t0);
 	string reg1 = "";
 	if (src2 != NULL)
 		reg1 = loadReg(src2, $t1);
 	if (op == Operator::times) {
-		add(MipsCode::mul, $t0, reg0, reg1);
+		add(MipsCode::mul, regDst, reg0, reg1);
 	}
 	else if (op == Operator::plus) {
-		add(MipsCode::add, $t0, reg0, reg1);
+		add(MipsCode::add, regDst, reg0, reg1);
 	}
 	else if (op == Operator::minus) {
-		add(MipsCode::sub, $t0, reg0, reg1);
+		add(MipsCode::sub, regDst, reg0, reg1);
 	}
 	else if (op == Operator::slash) {
 		add(MipsCode::ddiv, reg0, reg1);
-		add(MipsCode::mflo, $t0);
+		add(MipsCode::mflo, regDst);
 	}
 	else if (op == Operator::neg) {
-		add(MipsCode::sub, $t0, $0, reg0);
+		add(MipsCode::sub, regDst, $0, reg0);
 	}
-	storeMem($t0, dst);
+	storeMem(regDst, dst);
 }
 
+// **** 常数赋值直接li  ???????????????????????????????????????????????????????????????????????????????????
 void mipsObjCode::assign(SymbolItem* dst, SymbolItem*value) {
-	// offset may be NULL if not array
+	add(MipsCode::note, "assign");
 	string reg = loadReg(value, $t0);
 	storeMem(reg, dst);
+	add(MipsCode::note, "end assign");
 }
 
 void mipsObjCode::compare(Operator op, SymbolItem* dst, SymbolItem*src1, SymbolItem*src2) {
@@ -263,17 +326,32 @@ void mipsObjCode::jump(Operator op, SymbolItem* label, SymbolItem* s1, SymbolIte
 }
 
 void mipsObjCode::setLab(SymbolItem* label) {
+	if (label->lab == labelType::fun_lb || label->lab == labelType::main_lb) {
+		current_fun = label->funItem;
+		regTab.clear();
+	}
 	add(MipsCode::label, label->ident_name+":");
 }
 
 void mipsObjCode::save(SymbolItem* fun1, SymbolItem* fun2) {
 	// save some registers used by fun1, and move $sp for fun2
-
+	add(MipsCode::note, "save");
 	add(MipsCode::move, $fp, $sp);
 	add(MipsCode::subi, $sp, $sp, int2string(fun2->totalSize));
+	for (auto item : regTab) {
+		if (fun1->link->count((item.second->ident_name)) && (*(fun1->link))[item.second->ident_name] == item.second) {
+			save_restore.insert(item.second);
+		}
+	}
+	for (auto item : fun1->paraItems) {
+		save_restore.insert(item);
+	}
+	for (auto item : save_restore) {
+		saveReg(item, true);
+	}
 }
 
-void mipsObjCode::storePara(SymbolItem* paras) {
+void mipsObjCode::storePara(SymbolItem* paras, SymbolItem* fun) {
 	/* paras->paras record the parameters, and save() must be called before this function
 	   optimize: 1. item is register. 
 				 2. donnot need to store into memory
@@ -282,34 +360,84 @@ void mipsObjCode::storePara(SymbolItem* paras) {
 		fatal("storePara", "obj error or paras is NULL", paras);
 	}
 	int paraStack = 4;
-	for (auto item = paras->paras.begin(); item != paras->paras.end(); item++) {
+	add(MipsCode::note, "storePara");
+	for (int i = 0; i < paras->paras.size(); i++) {
+		/*
+		string reg = loadReg(paras->paras[i], $t0, true);
+		add(MipsCode::sw, reg, int2string(paraStack), $sp);
+		paraStack += INTSIZE;
+		*/
+		/*********************/
+		auto actParas = fun->paraItems;
+		if (actParas[i]->allocated_reg != "") {
+			// actParas[i]->isUsingReg = true;
+			// actParas[i]->saved = false;
+			// actParas[i]->initial = false;
+			if (actParas[i]->allocated_reg == paras->paras[i]->allocated_reg && paras->paras[i]->isUsingReg) {
+
+			}
+			else if (paras->paras[i]->allocated_reg != "" && paras->paras[i]->isUsingReg) {
+				add(MipsCode::move, actParas[i]->allocated_reg, paras->paras[i]->allocated_reg);
+			}
+			else {
+				// load if this two vars using different regs or paras.paras is not using reg.
+				if (paras->paras[i]->obj != ObjectiveType::constty) {
+					add(MipsCode::lw, actParas[i]->allocated_reg, int2string(paras->paras[i]->addr), $fp);
+				}
+				else {
+					add(MipsCode::li, actParas[i]->allocated_reg, int2string(paras->paras[i]->addr));
+				}
+			}
+			if (regTab.count(actParas[i]->allocated_reg)) {
+				regTab[actParas[i]->allocated_reg]->isUsingReg = false;
+				saveReg(regTab[actParas[i]->allocated_reg], true);
+			}
+			// regTab[actParas[i]->allocated_reg] = actParas[i];	// 更新寄存器表
+		}
+		else {
+			string reg = loadReg(paras->paras[i], $t0, true);
+			add(MipsCode::sw, reg, int2string(paraStack), $sp);
+		}
+		paraStack += INTSIZE;
+		/*********************/
+	}
+	/*for (auto item = paras->paras.begin(); item != paras->paras.end(); item++) {
 		string reg = loadReg(*item, $t0, true);
 		add(MipsCode::sw, reg, int2string(paraStack), $sp);
 		paraStack += INTSIZE;
-	}
+	}*/
+	add(MipsCode::note, "end storePara");
 }
 
 void mipsObjCode::call(SymbolItem* fun) {
+	// isUsingReg = false
+	for (auto item : regTab) {
+		item.second->isUsingReg = false;
+	}
 	add(MipsCode::note, "call");
 	// paraStack = 4;
 	add(MipsCode::jal, fun->fun_label->ident_name);
 }
 
+//?????????????? lw $ra ?????????????????????????????????????????????????????????????????????
 void mipsObjCode::ret(SymbolItem* fun, SymbolItem* retItem) {
 	if (fun->hasRet && retItem != NULL) {
 		// has return value in retItem;
 		if (retItem->obj == ObjectiveType::constty)
 			add(MipsCode::li, $v0, int2string(retItem->addr));
-		else
-			loadReg(retItem, $v0);
+		else {
+		/*******************************************************************/
+			string retVar = loadReg(retItem, $v0);
+			if (retVar != $v0) {
+				add(MipsCode::move, $v0, retVar);
+			}
+		/*******************************************************************/
 			//add(MipsCode::lw, $v0, int2string(retItem->addr), $sp);
-		/* lb or lw
-		if (fun->typ == Type::chartp) 
-			add(MipsCode::lb, $v0, int2string(retItem->addr), $sp);
-		else 
-			add(MipsCode::lw, $v0, int2string(retItem->addr), $sp);
-		*/
+		}
 	}
+	//for (auto item : regTab) {
+	//	item.second->isUsingReg = false;
+	//}
 	// restore memory
 	add(MipsCode::lw, $ra, "0", $sp);
 	add(MipsCode::addi, $sp, $sp, int2string(fun->totalSize));
@@ -317,7 +445,17 @@ void mipsObjCode::ret(SymbolItem* fun, SymbolItem* retItem) {
 }
 
 void mipsObjCode::restore(SymbolItem* fun) {
-	// load some register value, no need
+	add(MipsCode::note, "restore");
+	// load some register value
+	for (auto var : save_restore) {
+		if (var->allocated_reg != "") {
+			add(MipsCode::lw, var->allocated_reg, int2string(var->addr), $sp);
+			regTab[var->allocated_reg] = var;
+			var->isUsingReg = true;
+		}
+	}
+	save_restore.clear();
+	add(MipsCode::note, "end restore");
 }
 
 void mipsObjCode::arrayLoad(SymbolItem* dst, SymbolItem* offset, SymbolItem* base) {
@@ -351,36 +489,35 @@ void mipsObjCode::arrayLoad(SymbolItem* dst, SymbolItem* offset, SymbolItem* bas
 		if (base->typ == Type::chartp) {
 			if (base->level == 1) {
 				// addr = $sp + base + CHARSIZE * offset
-				add(MipsCode::add, $t2, $sp, reg1);
-				add(MipsCode::lb, reg0, int2string(base->addr), $t2);
+				add(MipsCode::add, $t1, $sp, reg1);
+				add(MipsCode::lb, reg0, int2string(base->addr), $t1);
 			}
 			else
 				add(MipsCode::lb, reg0, base->ident_name + "(" + reg1 + ")");
 		}
 		else if (base->typ == Type::inttp) {
-			add(MipsCode::sll, $t2, reg1, "2");	// $t2 = offset * INTSIZE
+			add(MipsCode::sll, $t1, reg1, "2");	// $t1 = offset * INTSIZE
 			if (base->level == 1) {
 				// addr = $sp + base + INTSIZE * offset
-				add(MipsCode::add, $t2, $sp, $t2);	// $t2 = $sp + INTSIZE * offset
-				add(MipsCode::lw, reg0, int2string(base->addr), $t2);
+				add(MipsCode::add, $t1, $sp, $t1);	// $t1 = $sp + INTSIZE * offset
+				add(MipsCode::lw, reg0, int2string(base->addr), $t1);
 			}
 			else
-				// addr = varName($offset_reg) = name($t2);
-				add(MipsCode::lw, reg0, base->ident_name + "($t2)");
+				// addr = varName($offset_reg) = name($t1);
+				add(MipsCode::lw, reg0, base->ident_name + "($t1)");
 		}
 		else 
 			fatal("arrayLoad", "type error", base);
 	}
 	else 
 		fatal("arrayLoad", "obj error: expect const, var, tmp", offset);
-	storeMem(reg0, dst);
-	// ???????????????????????????? may not need to store
+
+	storeMem(reg0, dst);	// record saved status
 	// global variable must storeMem
 }
 
 void mipsObjCode::arrayStore(SymbolItem* value, SymbolItem* offset, SymbolItem* base) {
-	/* base[off] = value
-	
+	/* base[off] <= value
 	*/
 	string reg0 = loadReg(value, $t0);
 	if (offset->obj == ObjectiveType::constty) {
@@ -404,23 +541,23 @@ void mipsObjCode::arrayStore(SymbolItem* value, SymbolItem* offset, SymbolItem* 
 	}
 	else if(offset->obj == ObjectiveType::varty || offset->obj == ObjectiveType::tmp) {
 		string reg1 = loadReg(offset, $t1);
-		if (base->typ == Type::chartp) {	// $t2 = offset
+		if (base->typ == Type::chartp) {	// $t1 = offset
 			if (base->level == 1) {
-				add(MipsCode::add, $t2, reg1, $sp);
-				add(MipsCode::sb, reg0, int2string(base->addr), $t2);
+				add(MipsCode::add, $t1, reg1, $sp);
+				add(MipsCode::sb, reg0, int2string(base->addr), $t1);
 			}
 			else {
 				add(MipsCode::sb, reg0, base->ident_name + "(" + reg1 + ")");
 			}
 		}
-		else if (base->typ == Type::inttp) {	// $t2 = offset
-			add(MipsCode::sll, $t2, reg1, "2");
+		else if (base->typ == Type::inttp) {	// $t1 = offset
+			add(MipsCode::sll, $t1, reg1, "2");
 			if (base->level == 1) {
-				add(MipsCode::add, $t2, $t2, $sp);
-				add(MipsCode::sw, reg0, int2string(base->addr), $t2);
+				add(MipsCode::add, $t1, $t1, $sp);
+				add(MipsCode::sw, reg0, int2string(base->addr), $t1);
 			}
 			else
-				add(MipsCode::sw, reg0, base->ident_name + "($t2)");
+				add(MipsCode::sw, reg0, base->ident_name + "($t1)");
 		}
 		else {
 			fatal("arrayStore", "type error: not int or char", base);
@@ -496,16 +633,25 @@ void mipsObjCode::print(SymbolItem* str, SymbolItem* exp) {
 			add(MipsCode::li, $v0, "11");
 			if (exp->level == 0)
 				add(MipsCode::lb, $a0, exp->ident_name);
-			else
-				add(MipsCode::lb, $a0, int2string(exp->addr), $sp);
+			else {
+				if (exp->isUsingReg && exp->allocated_reg != "") {
+					add(MipsCode::move, $a0, exp->allocated_reg);
+				}
+				else
+					add(MipsCode::lb, $a0, int2string(exp->addr), $sp);
+			}
 			add(MipsCode::syscall);
 		}
 		else if (exp->typ == Type::inttp) {
 			add(MipsCode::li, $v0, "1");
 			if (exp->level == 0)
 				add(MipsCode::lw, $a0, exp->ident_name);
-			else
-				add(MipsCode::lw, $a0, int2string(exp->addr), $sp);
+			else {
+				if (exp->allocated_reg != "" && exp->isUsingReg)
+					add(MipsCode::move, $a0, exp->allocated_reg);
+				else
+					add(MipsCode::lw, $a0, int2string(exp->addr), $sp);
+			}
 			add(MipsCode::syscall);
 		}
 		else

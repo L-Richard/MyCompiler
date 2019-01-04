@@ -28,6 +28,7 @@ void SymbolTable::enterFunc(Token name_token, enum Type typ, SymbolItem* label) 
 		item->ident_name = name;
 		item->level = 0;
 		item->typ = typ;
+		label->funItem = item;	// fun_lb -> funItem
 		if (typ == Type::inttp || typ == Type::chartp) {
 			item->hasRet = true;
 		}
@@ -38,13 +39,14 @@ void SymbolTable::enterFunc(Token name_token, enum Type typ, SymbolItem* label) 
 	}
 }
 
-void SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize) {
+SymbolItem* SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize, bool isInitial) {
 	string name = name_token.getIdentName();
 	SymbolItem *item = new SymbolItem();
 	item->ident_name = name;
 	item->typ = typ;
 	item->level = this->level;
 	item->arrayNumMax = arraySize;
+	item->initial = isInitial;	// 是否有初始值，只有参数是false表示有初值
 	// compute variable size
 	int tmpSize = typeSize(typ);
 	if (arraySize == 0) {
@@ -73,6 +75,7 @@ void SymbolTable::enterVar(Token name_token, enum Type typ, int arraySize) {
 		}
 	}
 	align();
+	return item;
 }
 
 void SymbolTable::enterTemp(SymbolItem* tmp) {
@@ -91,7 +94,15 @@ void SymbolTable::enterTemp(SymbolItem* tmp) {
 
 void SymbolTable::enterPara(Token name_token, enum Type typ) {
 	string name = name_token.getIdentName();
-	enterVar(name_token, typ, 0);
+	auto para = enterVar(name_token, typ, 0, false);	// 参数有初始值，initial=false
+	lastFunItem->paraItems.push_back(para);
+	para->isPara = true;
+	/*
+	if (lastFunItem->paraNum < paraRegs.size()) {
+		para->paraReg = paraRegs[lastFunItem->paraNum];
+	}
+	lastFunItem->paraNum++;
+	*/
 	lastFunItem->paraSize += typeSize(typ);
 	lastFunItem->paraList.push_back(typ);
 }
@@ -161,8 +172,6 @@ void SymbolTable::removeLastTemp(SymbolItem* Temp) {
 	ftab->erase(Temp->ident_name);
 	stack -= INTSIZE;
 	lastFunItem->tmpSize -= INTSIZE;
-}
-void SymbolTable::killVar(SymbolItem* var) {
-
+	// lastFunItem->paraNum = 0;
 }
 

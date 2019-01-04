@@ -65,7 +65,7 @@ private:
 		case MipsCode::jal:	return "jal"; 
 		case MipsCode::jr:	return "jr"; 
 		
-		case MipsCode::add:	return "add"; 
+		case MipsCode::add:		return "addu"; 
 		case MipsCode::addi:	return "addi"; 
 		case MipsCode::sub:		return "sub"; 
 		case MipsCode::subi:	return "subi"; 

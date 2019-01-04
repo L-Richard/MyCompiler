@@ -101,7 +101,7 @@ void MidCodeGen::emit(Operator op, SymbolItem* dst, SymbolItem* src1, SymbolItem
 	midCodes.push_back(tmp);
 }
 
-void MidCodeGen::print(string filename) {
+void MidCodeGen::print(string filename, vector<Quadruples> &midCodes) {
 	ofstream  outfile;
 	outfile.open(filename);
 	for (auto item = midCodes.begin(); item != midCodes.end(); item++) {

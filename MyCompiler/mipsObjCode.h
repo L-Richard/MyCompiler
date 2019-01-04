@@ -20,6 +20,12 @@ private:
 	list<Instruction> ins;
 	map<string, string> strTab;	// map<string content, string name>
 
+	Quadruples* current_code;
+	set<SymbolItem*> save_restore;
+	
+	map<string, SymbolItem*> regTab;	// 记录寄存器使用情况
+	SymbolItem* current_fun = NULL;
+
 	int string_count = 0;
 	// int paraStack = 4;	// first 4 bytes store $ra, 
 	int pc = 0;
@@ -30,6 +36,7 @@ public:
 	void translate();
 	void enterDataSeg();
 
+	void saveReg(SymbolItem* src, bool useFp = false);
 	string loadReg(SymbolItem *src, string reg, bool fp = false);
 	void storeMem(string reg, SymbolItem *dst);
 
@@ -41,7 +48,7 @@ public:
 	void setLab(SymbolItem* label);
 
 	void save(SymbolItem* fun1, SymbolItem* fun2);
-	void storePara(SymbolItem* paras);
+	void storePara(SymbolItem* paras, SymbolItem* fun);
 	void call(SymbolItem* fun);
 	// st$ra
 	void ret(SymbolItem* fun, SymbolItem* retItem);
@@ -57,7 +64,7 @@ public:
 
 	void add(MipsCode _op) {
 		ins.push_back(Instruction(_op));
-	}
+}
 	void add(MipsCode _op, string _des) {
 		ins.push_back(Instruction(_op, " " + _des));
 	}
@@ -90,7 +97,6 @@ public:
 	void printObjFile(string fileName) {
 		ofstream outfile;
 		
-		enterDataSeg();
 		text.push_back(".text");
 		for (auto item = ins.begin(); item != ins.end(); item++) {
 			text.push_back(item->printInstr());

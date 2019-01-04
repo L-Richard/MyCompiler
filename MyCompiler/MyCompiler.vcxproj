@@ -153,19 +153,24 @@
   <ItemGroup>
     <ClInclude Include="c0_enum.h" />
     <ClInclude Include="Const.h" />
+    <ClInclude Include="DagGraph.h" />
     <ClInclude Include="Error.h" />
+    <ClInclude Include="GlobalRegs.h" />
     <ClInclude Include="Instruction.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="MidCodeGen.h" />
     <ClInclude Include="mipsObjCode.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RegAdmin.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="Token.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DagGraph.cpp" />
     <ClCompile Include="Error.cpp" />
+    <ClCompile Include="GlobalRegs.cpp" />
     <ClCompile Include="Instruction.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="MidCodeGen.cpp" />
@@ -178,6 +183,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RegAdmin.cpp" />
     <ClCompile Include="SymbolTable.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>

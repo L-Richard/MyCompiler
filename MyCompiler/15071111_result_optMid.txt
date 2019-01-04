@@ -80,8 +80,7 @@
             les              i                end_while_lb17
           times              a              i              b
           times              j              n              c
-          times              a              i              a
-           plus              a              b       !Temp_18
+           plus              b              b       !Temp_18
            plus       !Temp_18              c              a
            plus              i              1              i
             jmp                                   while_lb18

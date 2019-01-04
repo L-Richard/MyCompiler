@@ -7,9 +7,9 @@ enum ObjectiveType {
 	functy,
 	arrayty,
 
-	tmp,		// tmp, when optimizing, mem or reg
+	tmp,		// tmp, optimizing: dag, mem or reg
 	label,
-	paras,		// use when send parameters
+	paras,		// use when send parameters, a set of several paras
 };
 enum kind {
 	// used in midcode, and optimizing
