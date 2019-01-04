@@ -142,6 +142,18 @@ public:
 		return this->src2;
 	}
 
+	void setOp(string s) {
+		this->op = s;
+	}
+	void setDst(string s) {
+		this->des = s;
+	}
+	void setS1(string s) {
+		this->src1 = s;
+	}
+	void setS2(string s) {
+		this->src2 = s;
+	}
 	~Instruction();
 };
 

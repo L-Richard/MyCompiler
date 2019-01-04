@@ -26,6 +26,7 @@
 	# calc
 	li $t1, 1
 	sub $a2, $a1, $t1
+	# end calc
 	# save
 	move $fp, $sp
 	subi $sp, $sp, 20
@@ -43,6 +44,7 @@
 	# end restore
 	# calc
 	mul $s0, $a1, $a3
+	# end calc
 	move $v0, $s0
 	lw $ra, 0($sp)
 	addi $sp, $sp, 20
@@ -52,10 +54,13 @@
 	# calc
 	div $a2, $a1
 	mflo $a3
+	# end calc
 	# calc
 	mul $s0, $a3, $a1
+	# end calc
 	# calc
 	sub $a2, $a2, $s0
+	# end calc
 	move $v0, $a2
 	lw $ra, 0($sp)
 	addi $sp, $sp, 20
@@ -138,17 +143,19 @@
 	# calc
 	div $a3, $s1
 	mflo $s2
+	# end calc
 	# calc
 	mul $s3, $s2, $s1
+	# end calc
 	# save
 	move $fp, $sp
 	subi $sp, $sp, 20
 	sw $s1, 520($fp)
 	sw $a3, 524($fp)
-	sw $a1, 532($fp)
-	sw $a2, 528($fp)
 	sw $s3, 536($fp)
+	sw $a2, 528($fp)
 	sw $s2, 572($fp)
+	sw $a1, 532($fp)
 	# storePara
 	move $a2, $a3
 	move $a1, $s1
@@ -159,16 +166,17 @@
 	# restore
 	lw $s1, 520($sp)
 	lw $a3, 524($sp)
-	lw $a1, 532($sp)
-	lw $a2, 528($sp)
 	lw $s3, 536($sp)
+	lw $a2, 528($sp)
+	lw $a1, 532($sp)
 	# end restore
 	bne $s2, 0, end_if_lb11
 	# calc
-	li $t1, 1
-	addu $a2, $a2, $t1
+	addiu $a2, $a2, 1
+	# end calc
 	# calc
 	sub $a1, $a1, $s1
+	# end calc
 	blt $a2, 128, end_if_lb12
 	# print
 	li $v0, 4
@@ -182,8 +190,8 @@
  end_if_lb13:
  end_if_lb11:
 	# calc
-	li $t1, 1
-	addu $s1, $s1, $t1
+	addiu $s1, $s1, 1
+	# end calc
 	j while_lb10
  end_while_lb9:
 	bne $a1, 0, end_if_lb14
@@ -217,8 +225,8 @@
 	la $a0, _str_endl
 	syscall
 	# calc
-	li $t1, 1
-	addu $s1, $s1, $t1
+	addiu $s1, $s1, 1
+	# end calc
 	j while_lb16
  end_while_lb15:
 	# print
@@ -227,8 +235,8 @@
 	syscall
  end_if_lb14:
 	# calc
-	li $t1, 1
-	addu $a3, $a3, $t1
+	addiu $a3, $a3, 1
+	# end calc
 	j while_lb8
  end_while_lb7:
 	# print
@@ -248,16 +256,20 @@
 	# calc
 	lw $a1, 560($sp)
 	mul $a1, $a1, $s1
+	# end calc
 	# calc
 	mul $s2, $a3, $a2
+	# end calc
 	# calc
 	addu $s3, $a1, $a1
+	# end calc
 	# calc
 	lw $a1, 560($sp)
 	addu $a1, $s3, $s2
+	# end calc
 	# calc
-	li $t1, 1
-	addu $s1, $s1, $t1
+	addiu $s1, $s1, 1
+	# end calc
 	j while_lb18
  end_while_lb17:
 	# assign
@@ -270,9 +282,10 @@
 	bge $s1, 1024, end_while_lb19
 	# calc
 	addu $a1, $a1, $s1
+	# end calc
 	# calc
-	li $t1, 1
-	addu $s1, $s1, $t1
+	addiu $s1, $s1, 1
+	# end calc
 	j while_lb20
  end_while_lb19:
 	# print
@@ -291,45 +304,48 @@
 	syscall
 	# assign
 	li $t0, 0
-	move $a1, $t0
-	# end assign
-	# assign
-	li $t0, 1
 	move $a2, $t0
 	# end assign
 	# assign
+	li $t0, 1
+	move $a1, $t0
+	# end assign
+	# assign
 	li $t0, 2
-	move $s0, $t0
+	move $a3, $t0
 	# end assign
  while_lb22:
-	bgt $s0, 1024, end_while_lb21
+	bgt $a3, 1024, end_while_lb21
 	# calc
 	li $t1, 2
-	div $s0, $t1
-	mflo $a3
+	div $a3, $t1
+	mflo $s0
+	# end calc
 	# assign
 	li $t0, 2
 	move $s1, $t0
 	# end assign
  while_lb24:
-	bgt $s1, $a3, end_while_lb23
+	bgt $s1, $s0, end_while_lb23
 	# calc
-	div $s0, $s1
+	div $a3, $s1
 	mflo $s2
+	# end calc
 	# calc
 	mul $s3, $s2, $s1
+	# end calc
 	# save
 	move $fp, $sp
 	subi $sp, $sp, 20
 	sw $s1, 520($fp)
-	sw $s0, 540($fp)
-	sw $a3, 544($fp)
-	sw $a2, 552($fp)
-	sw $a1, 548($fp)
 	sw $s3, 556($fp)
+	sw $s0, 544($fp)
+	sw $a3, 540($fp)
+	sw $a2, 548($fp)
+	sw $a1, 552($fp)
 	sw $s2, 588($fp)
 	# storePara
-	move $a2, $s0
+	move $a2, $a3
 	move $a1, $s1
 	# end storePara
 	# call
@@ -337,45 +353,47 @@
 	move $s2, $v0
 	# restore
 	lw $s1, 520($sp)
-	lw $s0, 540($sp)
-	lw $a3, 544($sp)
-	lw $a2, 552($sp)
-	lw $a1, 548($sp)
 	lw $s3, 556($sp)
+	lw $s0, 544($sp)
+	lw $a3, 540($sp)
+	lw $a2, 548($sp)
+	lw $a1, 552($sp)
 	# end restore
 	bne $s2, 0, end_if_lb25
 	# assign
 	li $t0, 0
-	move $a2, $t0
+	move $a1, $t0
 	# end assign
  end_if_lb25:
 	# calc
-	li $t1, 1
-	addu $s1, $s1, $t1
+	addiu $s1, $s1, 1
+	# end calc
 	j while_lb24
  end_while_lb23:
-	bne $a2, 1, end_if_lb26
+	bne $a1, 1, end_if_lb26
 	# print
 	li $v0, 4
 	la $a0, _str_10
 	syscall
 	li $v0, 1
-	move $a0, $s0
+	move $a0, $a3
 	syscall
 	li $v0, 4
 	la $a0, _str_endl
 	syscall
 	# calc
-	li $t1, 1
-	addu $a1, $a1, $t1
+	addiu $a2, $a2, 1
+	# end calc
 	# calc
 	li $t1, 10
-	div $a1, $t1
+	div $a2, $t1
 	mflo $s2
+	# end calc
 	# calc
 	li $t1, 10
 	mul $s3, $s2, $t1
-	bne $s3, $a1, end_if_lb27
+	# end calc
+	bne $s3, $a2, end_if_lb27
 	# print
 	li $v0, 4
 	la $a0, _str_7
@@ -384,11 +402,11 @@
  end_if_lb26:
 	# assign
 	li $t0, 1
-	move $a2, $t0
+	move $a1, $t0
 	# end assign
 	# calc
-	li $t1, 1
-	addu $s0, $s0, $t1
+	addiu $a3, $a3, 1
+	# end calc
 	j while_lb22
  end_while_lb21:
 	# print
@@ -396,7 +414,7 @@
 	la $a0, _str_11
 	syscall
 	li $v0, 1
-	move $a0, $a1
+	move $a0, $a2
 	syscall
 	li $v0, 4
 	la $a0, _str_endl

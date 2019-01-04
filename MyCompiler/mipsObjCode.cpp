@@ -11,11 +11,16 @@ const string $v0 = "$v0";
 const string $t0 = "$t0";
 const string $t1 = "$t1";
 const string $a0 = "$a0";
-const string $0  = "$0";
+const string $0 = "$0";
 const string $t4 = "$t4";
 const string $t5 = "$t5";
 const string $t6 = "$t6";
 const string $t7 = "$t7";
+const set<string> add_move = {
+	"add", "move"
+};
+const set<string> tempRegs = { $t0, $t1 };
+
 
 mipsObjCode::mipsObjCode(SymbolTable &tab, vector<Quadruples> &codes) : tab(tab), midCodes(codes) {
 }
@@ -55,6 +60,40 @@ void mipsObjCode::peepHole() {
 					item--;
 					ins.erase(next(item, 1));
 				}
+			}
+		}
+		if (item->getOp() == "#" && item->getDst() == " calc") {
+			auto code1 = next(item, 1);
+			auto code2 = next(item, 2);
+			if (code1->getOp() == "li" && code2->getOp() == "addu"
+				&& (code1->getDst() == " $t0" || code1->getDst() == " $t1")) {
+
+				string con = code1->getS1();
+				string tempReg = "," + code1->getDst();
+				if (code2->getS1() == tempReg) {
+					// li $t1, 1
+					// add $a1, $t1, $a2	==>   addi $a1, $a2, 1
+					code2->setOp("addiu");
+					code2->setS1(code2->getS2());
+					code2->setS2(con);
+					ins.erase(code1);
+				}	// end if : opt addi s1
+				else if (code2->getS2() == tempReg) {
+					// li $t1, 1
+					// add $a1, $a2, $t1	==>   addi $a1, $a2, 1
+					code2->setOp("addiu");
+					code2->setS2(con);
+					ins.erase(code1);
+				}	// end if : opt addi s2
+			}	// end if : opt li + add
+			else if (code1->getOp() == "li" && code2->getOp() == "move"
+				&& (code1->getDst() == " $t0" || code1->getDst() == " $t1")
+				&& code2->getS1() == code1->getDst()) {
+				// li $t0, 1
+				// move $a1, $t0
+				code2->setOp("li");
+				code2->setS1(code1->getS1());
+				ins.erase(code1);
 			}
 		}
 	}
@@ -283,6 +322,7 @@ void mipsObjCode::calculate(Operator op, SymbolItem* dst, SymbolItem*src1, Symbo
 		add(MipsCode::sub, regDst, $0, reg0);
 	}
 	storeMem(regDst, dst);
+	add(MipsCode::note, "end calc");
 }
 
 // **** 常数赋值直接li  ???????????????????????????????????????????????????????????????????????????????????
