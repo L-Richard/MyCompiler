@@ -112,7 +112,7 @@ public:
 
 
 	// if statement: remove blank if statement
-	void opt_if_record_start() {
+	/*void opt_if_record_start() {
 		// record current tail midcode index
 		opt_if_start_index = midCodes.end()-midCodes.begin();
 	}
@@ -158,7 +158,7 @@ public:
 				break;
 			}
 		}
-	}
+	}*/
 
 	vector<Quadruples>& getMidCodes() {
 		return midCodes;

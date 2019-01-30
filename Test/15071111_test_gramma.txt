@@ -143,7 +143,7 @@ void main() {
 	printf("test global and local same name ident:");
 	printf("sameName in main: ", sameName);
 
-	printf("test printf: -------------------------- ")
+	printf("test printf: -------------------------- ");
 	printf("", g_const_char2);
 	printf("", g_const_int2);
 	printf("g_const_char1 = ", g_const_char1);

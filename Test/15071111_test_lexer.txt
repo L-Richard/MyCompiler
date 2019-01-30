@@ -121,11 +121,6 @@ int main() {
 		printf("g_array_char[i] = ", g_array_int[i]);
 
 	printf("Fibnaci result of n ", F(n));
-	'asdf'
-	''
-	'a'
-	"asfd"
-	'sdaf
 	printf("ll
 	
 

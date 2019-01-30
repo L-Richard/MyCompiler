@@ -670,7 +670,7 @@ void Parser::ifStatement(SymSet fsys) {
 	test({ Symbol::lparent }, statementBsys, 19);
 	if (current_token.getSymbol() == Symbol::lparent) {
 		nextSym();
-		codeGen.opt_if_record_start();	// optimize blank if statement
+		//codeGen.opt_if_record_start();	// optimize blank if statement
 		condition(endifLabel);
 		/////////////////////////////////////////////////////////////////
 		test({ Symbol::rparent }, fsys, 20);
@@ -684,16 +684,18 @@ void Parser::ifStatement(SymSet fsys) {
 			std::cout << "出错：不是语句开头符号!" << endl;
 #endif // DEBUG_Gramma_analysis
 		}
+		statement();
+		/*
 		if (statementBsys.count(current_token.getSymbol())) {
 			codeGen.opt_if_record_statement();
-			statement();
 		}
 		if (codeGen.getCon() == ConditionOptim::unknownCon) {
-			codeGen.setLabel(endifLabel);
 			codeGen.opt_if_record_end();
 			codeGen.opt_if_optimize();
 		}
 		codeGen.restoreCon();
+		*/
+		codeGen.setLabel(endifLabel);
 	}
 }
 
@@ -735,10 +737,12 @@ void Parser::switchStatement() {
 				defaultStatement();
 			}
 		}
-		if (tmpExp->obj != ObjectiveType::constty) {
+		/*if (tmpExp->obj != ObjectiveType::constty) {
 			codeGen.setLabel(end_switch);
 		}
-		codeGen.restoreCon();
+		*/
+		codeGen.setLabel(end_switch);
+		//codeGen.restoreCon();
 		test({ rbrace }, statementBsys, 17);
 		if (current_token.getSymbol() == rbrace) {
 			nextSym();
@@ -802,11 +806,11 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 		*/
 		constValue = new SymbolItem();
 	}
+	/* ??????????????????????????????????????????????????????????
 	if (expItem->obj == ObjectiveType::constty && codeGen.getCon() != ConditionOptim::falseCon) {
-		/* if expItem is const, optimize.
+		 if expItem is const, optimize.
 			if there is true case, delete false case and default
 			if no true case, only keep default
-		*/
 		if (expItem->addr == constValue->addr) {
 			codeGen.setTrueCon();
 		}
@@ -814,7 +818,8 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 			skip_case = true;
 			codeGen.setFalseCon();
 		}
-	}
+	}*/
+
 	/*  note: if expItem is const, then 
 		false condition won't emit code inside the codeGen
 		true neither don't need the jmp or setlabel code
@@ -828,15 +833,17 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 		nextSym();
 	}
 	statement();
+
+	codeGen.emit(Operator::jmp, end_switch, NULL, NULL);
+	codeGen.emit(Operator::setLabel, end_case, NULL, NULL);
+/*
 	if (expItem->obj != ObjectiveType::constty) {
-		codeGen.emit(Operator::jmp, end_switch, NULL, NULL);
-		codeGen.emit(Operator::setLabel, end_case, NULL, NULL);
 	}
 	else {
-		/* if expItem is const,
+		 if expItem is const,
 		if condition is true, set condition false to skip all cases.
 		if condition is false, restore condition value, 
-		*/
+
 		if (codeGen.getCon() == ConditionOptim::trueCon) { //match
 			codeGen.setFalseCon();
 		}
@@ -844,6 +851,7 @@ void Parser::caseStatement(SymbolItem* expItem, SymbolItem* end_switch, map<int,
 			codeGen.restoreCon();
 		}
 	}
+*/
 }
 
 void Parser::defaultStatement() {
@@ -894,11 +902,12 @@ void Parser::whileStatement() {
 		}
 		codeGen.emit(Operator::jmp, start_while, NULL, NULL);
 
-		if (codeGen.getCon() == ConditionOptim::unknownCon) {
-			codeGen.setLabel(end_while);
+		codeGen.setLabel(end_while);
+		/*if (codeGen.getCon() == ConditionOptim::unknownCon) {
 		}
 		else if (codeGen.getCon() == ConditionOptim::trueCon) {
 			// true condition: warning: dead loop
+			codeGen.setLabel(end_while);
 			cout << "Warning: ";
 			cout << error_token.getlc() << "行: " << error_token.getcc() << "列: ";
 			cout << "存在死循环，while条件永真" << endl;
@@ -908,6 +917,7 @@ void Parser::whileStatement() {
 			codeGen.eraseLabel(start_while);
 		}
 		codeGen.restoreCon();
+		*/
 	}
 }
 
@@ -1141,6 +1151,16 @@ void Parser::condition(SymbolItem* label) {
 		// if (tpSet.count(exp1->typ) &&  tpSet.count(exp2->typ) && exp1->typ != exp2->typ) {
 		// 	error_handler.reportErrorMsg(current_token, 30);
 		// }
+		Operator op = codeGen.symbol2Operator(sy);
+		if (exp1->obj == ObjectiveType::constty) {
+			// if exp1 is const, then exchange exp1 and exp2.
+			SymbolItem* tmpExp = exp1;
+			exp1 = exp2;
+			exp2 = tmpExp;
+			op = codeGen.op_lr(op);
+		}
+		codeGen.emit(op, label, exp1, exp2);
+		/*
 		if (exp1->obj == ObjectiveType::constty && exp2->obj == ObjectiveType::constty) {
 			int con = computeConditionVal(exp1->addr, exp2->addr, sy);
 			if (con == 0)
@@ -1164,9 +1184,11 @@ void Parser::condition(SymbolItem* label) {
 				op = codeGen.op_lr(op);
 			}
 			codeGen.emit(op, label, exp1, exp2);
-		}
+		}*/
 	}
 	else {
+		codeGen.emit(Operator::jez, label, exp1, NULL);
+		/*
 		if (exp1->obj == ObjectiveType::constty) {
 			if (exp1->addr == 0)
 				codeGen.setFalseCon();
@@ -1175,7 +1197,7 @@ void Parser::condition(SymbolItem* label) {
 		}
 		else {	// only need jump when exp is not const
 			codeGen.emit(Operator::jez, label, exp1, NULL);
-		}
+		}*/
 	}
 }
 

@@ -93,6 +93,15 @@ void GlobalRegs::baseBlock(vector<Quadruples>::iterator funHead, vector<Quadrupl
 	Base* lastBase = entrance;	// 顺序前置基本块
 	map<SymbolItem*, Base*> label_base;		// setlabel，
 	map<SymbolItem*, Base*> gotolabel_base;	// gotolabel,
+	/* parameters: all def, can't use same register */
+	if (!funItem->paraItems.empty()) {
+		Base* paraBase = new Base();
+		paraBase->useVars.insert(funItem->paraItems.begin(), funItem->paraItems.end());
+		paraBase->lastBases.insert(entrance);
+		entrance->nextBases.insert(paraBase);
+		lastBase = paraBase;
+	}
+	/************************************************/
 	for (auto item = funHead; item != funTail; item++) {
 		Base* base = new Base();
 		baseList.push_front(base);
@@ -213,9 +222,7 @@ void GlobalRegs::baseBlock(vector<Quadruples>::iterator funHead, vector<Quadrupl
 
 	// 基本块内寄存器分配
 	baseAllocateReg(baseList);
-	/*for (auto baseItem = baseList.begin(); baseItem != baseList.end(); baseItem++) {
-		baseAllocateReg(*baseItem);
-	}*/
+
 }
 
 void GlobalRegs::dsa(list<Base*> &baseList) {

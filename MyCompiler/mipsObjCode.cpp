@@ -16,10 +16,6 @@ const string $t4 = "$t4";
 const string $t5 = "$t5";
 const string $t6 = "$t6";
 const string $t7 = "$t7";
-const set<string> add_move = {
-	"add", "move"
-};
-const set<string> tempRegs = { $t0, $t1 };
 
 
 mipsObjCode::mipsObjCode(SymbolTable &tab, vector<Quadruples> &codes) : tab(tab), midCodes(codes) {
