@@ -137,8 +137,6 @@ public:
 		opt_if_statement_index = 0;
 		opt_if_end_index = 0;
 	}
-
-
 	void setFalseCon() {
 		this->con = ConditionOptim::falseCon;
 	}

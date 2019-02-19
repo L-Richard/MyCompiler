@@ -361,7 +361,7 @@ void Parser::paraList() {
 SymbolItem* Parser::function() {
 	/* begin with left parent, 
 	   end with symbol after right brace
-	   void foo(
+	   eg: void foo(
 	   */
 #ifdef DEBUG_Gramma_analysis
 	int lc = current_token.getlc();

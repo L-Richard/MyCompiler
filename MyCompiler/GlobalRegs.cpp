@@ -93,7 +93,8 @@ void GlobalRegs::baseBlock(vector<Quadruples>::iterator funHead, vector<Quadrupl
 	Base* lastBase = entrance;	// 顺序前置基本块
 	map<SymbolItem*, Base*> label_base;		// setlabel，
 	map<SymbolItem*, Base*> gotolabel_base;	// gotolabel,
-	/* parameters: all def, can't use same register */
+
+	/* parameters: all use, can't use same register */
 	if (!funItem->paraItems.empty()) {
 		Base* paraBase = new Base();
 		paraBase->useVars.insert(funItem->paraItems.begin(), funItem->paraItems.end());
@@ -101,7 +102,7 @@ void GlobalRegs::baseBlock(vector<Quadruples>::iterator funHead, vector<Quadrupl
 		entrance->nextBases.insert(paraBase);
 		lastBase = paraBase;
 	}
-	/************************************************/
+
 	for (auto item = funHead; item != funTail; item++) {
 		Base* base = new Base();
 		baseList.push_front(base);
@@ -429,16 +430,6 @@ void GlobalRegs::baseAllocateReg(list<Base*> &baseList) {
 			freeRegs.insert(releaseRegs.begin(), releaseRegs.end());
 		}
 	}
-	/*for (auto var : funItem->paraItems) {
-		if (!freeRegs.empty() && var->allocated_reg == "") {
-			var->allocated_reg = *freeRegs.begin();
-			freeRegs.erase(freeRegs.begin());
-			var->isUsingReg = true;
-			var->initial = false;
-			var->saved = false;
-		}
-	}
-	*/
 /* 可以再比较优化效果，选择一种方法
 	// 引用计数排序
 	vector<pair<SymbolItem*, int>> orderedBaseVars(ref_count.begin(), ref_count.end());
