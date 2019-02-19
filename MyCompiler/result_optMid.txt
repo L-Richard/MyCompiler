@@ -1,0 +1,149 @@
+            jmp                                     main_lb0
+       setLabel                                      fun_lb2
+          st$ra                                             
+            leq              n              1     end_if_lb3
+         return              1                     factorial
+       setLabel                                   end_if_lb3
+          minus              n              1        !Temp_0
+           save      factorial      factorial               
+         stPara                     factorial               
+           call                                    factorial
+       stRetVal                                      !Temp_1
+        restore      factorial                              
+          times              n        !Temp_1        !Temp_2
+         return        !Temp_2                     factorial
+       setLabel                                      fun_lb4
+          st$ra                                             
+          slash              x              y        !Temp_3
+          times        !Temp_3              y        !Temp_4
+          minus              x        !Temp_4              x
+         return              x                           mod
+       setLabel                                      fun_lb5
+          st$ra                                             
+          print           x =               x               
+          print           y =               y               
+         assign              x                          temp
+         assign              y                             x
+         assign           temp                             y
+          print      SWAP x =               x               
+          print      SWAP y =               y               
+         return                                         swap
+       setLabel                                      fun_lb6
+          st$ra                                             
+         assign            val                             j
+       setLabel                                    while_lb8
+            les              j                 end_while_lb7
+         assign             -1                             n
+         assign              j                             s
+         assign              1                             i
+       setLabel                                   while_lb10
+            les              i              j  end_while_lb9
+          slash              j              i        !Temp_6
+          times        !Temp_6              i             x1
+           save   complete_num            mod               
+         stPara                           mod               
+           call                                          mod
+       stRetVal                                      !Temp_8
+        restore   complete_num                              
+            eql        !Temp_8              0    end_if_lb11
+           plus              n              1              n
+          minus              s              i              s
+            geq              n            128    end_if_lb12
+          print OVERFLOW!                                        
+       setLabel                                  end_if_lb12
+            les              n            128    end_if_lb13
+          arrSt              n              k              i
+       setLabel                                  end_if_lb13
+       setLabel                                  end_if_lb11
+           plus              i              1              i
+            jmp                                   while_lb10
+       setLabel                                end_while_lb9
+            eql              s              0    end_if_lb14
+          print complete number:               j               
+         assign              0                             i
+       setLabel                                   while_lb16
+            leq              i              n end_while_lb15
+          arrLd              i              k       !Temp_12
+          print                      !Temp_12               
+           plus              i              1              i
+            jmp                                   while_lb16
+       setLabel                               end_while_lb15
+          print                                             
+       setLabel                                  end_if_lb14
+           plus              j              1              j
+            jmp                                    while_lb8
+       setLabel                                end_while_lb7
+          print ---------------------------------------------------------------                                        
+         assign              0                             a
+         assign              0                             i
+       setLabel                                   while_lb18
+            les              i                end_while_lb17
+          times              a              i              b
+          times              j              n              c
+           plus              b              b       !Temp_18
+           plus       !Temp_18              c              a
+           plus              i              1              i
+            jmp                                   while_lb18
+       setLabel                               end_while_lb17
+         assign              a                             b
+         assign              0                             i
+       setLabel                                   while_lb20
+            les              i                end_while_lb19
+           plus              b              i              b
+           plus              i              1              i
+            jmp                                   while_lb20
+       setLabel                               end_while_lb19
+          print           b =               b               
+          print ---------------------------------------------------------------                                        
+         assign              0                             h
+         assign              1                          leap
+         assign              2                             m
+       setLabel                                   while_lb22
+            leq              m                end_while_lb21
+          slash              m              2             k2
+         assign              2                             i
+       setLabel                                   while_lb24
+            leq              i             k2 end_while_lb23
+          slash              m              i       !Temp_24
+          times       !Temp_24              i             x2
+           save   complete_num            mod               
+         stPara                           mod               
+           call                                          mod
+       stRetVal                                     !Temp_26
+        restore   complete_num                              
+            eql       !Temp_26              0    end_if_lb25
+         assign              0                          leap
+       setLabel                                  end_if_lb25
+           plus              i              1              i
+            jmp                                   while_lb24
+       setLabel                               end_while_lb23
+            eql           leap              1    end_if_lb26
+          print                             m               
+           plus              h              1              h
+          slash              h             10       !Temp_29
+          times       !Temp_29             10             x2
+            eql             x2              h    end_if_lb27
+          print                                             
+       setLabel                                  end_if_lb27
+       setLabel                                  end_if_lb26
+         assign              1                          leap
+           plus              m              1              m
+            jmp                                   while_lb22
+       setLabel                               end_while_lb21
+          print          The total is               h               
+         return                                 complete_num
+       setLabel                                     main_lb0
+           save           main      factorial               
+         stPara                     factorial               
+           call                                    factorial
+       stRetVal                                     !Temp_32
+        restore           main                              
+         assign       !Temp_32                             n
+          print         10! =               n               
+           save           main           swap               
+         stPara                          swap               
+           call                                         swap
+           save           main   complete_num               
+         stPara                  complete_num               
+           call                                 complete_num
+       setLabel                                 end_main_lb1
